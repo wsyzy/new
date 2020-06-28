@@ -280,7 +280,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/26/test/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/28/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8FKVO/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wendyzy">
@@ -299,7 +299,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/06/26/test/" itemprop="url">test</a></h1>
+                <a class="post-title-link" href="/2020/06/28/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8FKVO/" itemprop="url">观察者模式KVO</a></h1>
         
 
         <div class="post-meta">
@@ -311,8 +311,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-26T12:27:06+08:00">
-                2020-06-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-28T14:20:35+08:00">
+                2020-06-28
               </time>
             
 
@@ -370,7 +370,851 @@
       
         
           
-            <p>1111</p>
+            <p>categories: iOS</p>
+<h3 id="与delegate的区别"><a href="#与delegate的区别" class="headerlink" title="与delegate的区别"></a>与delegate的区别</h3><p>delegate通常只能实现一对一的活动监管，而KVO能够脱离一对一的模式，通过多个对象注册一个事件，让多个对象同时观察这个事件并做出相应反应。</p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="注册监听"><a href="#注册监听" class="headerlink" title="注册监听"></a>注册监听</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[self.webView addObserver:self forKeyPath:@&quot;estimatedProgress&quot; options:NSKeyValueObservingOptionNew context:nil];</span><br></pre></td></tr></table></figure>
+
+<p>给self.webView添加一个观察者为self，设置监听属性为“estimatedProgress”，当此属性发生变化时（options设置为NSKeyValueObservingOptionNew），self将做出相应反应</p>
+<h3 id="哪些属性是可以被监听的呢"><a href="#哪些属性是可以被监听的呢" class="headerlink" title="哪些属性是可以被监听的呢"></a>哪些属性是可以被监听的呢</h3><p> – 当该属性注解有key-value时</p>
+<img src="/2020/06/28/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8FKVO/1.png" class>
+
+<h3 id="接收通知"><a href="#接收通知" class="headerlink" title="接收通知"></a>接收通知</h3><p>定义监听者self在接收到被监听者通知时作出的反应,其中change对应着注册监听时的options</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary&lt;NSKeyValueChangeKey, id&gt; *)change context:(nullable void *)context &#123;</span><br><span class="line">    self.progressView.progress &#x3D; self.webView.estimatedProgress;</span><br><span class="line">    NSLog(@&quot;&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="移除监听"><a href="#移除监听" class="headerlink" title="移除监听"></a>移除监听</h3><p>当监听者self被销毁的时候，需要将自己从被监听者self.webView移除掉</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (void)dealloc &#123;</span><br><span class="line">    [self.webView removeObserver:self forKeyPath:@&quot;estimatedProgress&quot;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><ul>
+<li><p>该示例监听的为webView加载url的进度情况，可以结合其WkNavigationDelegate中的decidePolicyForNavigationAction（请求，是否加载url）与didFinishNavigation（完成加载）结合使用，观察监听加载的效果</p>
+</li>
+<li><p>使用UIProgressView可以实现进度条的展示，设置改组件的progress值与webView的estimatedProgress相等便可观察到加载进度</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.progressView.progress &#x3D; self.webView.estimatedProgress;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>系统KVO框架存在 需要移除监听者所可能造成crash 和 方法名及参数过于复杂的问题。对此，我们可以采用常用的开源KVO框架（比如说FaceBook的KVOController，采用block进行回调处理，github获取框架）来解决crash风险以及方法和参数名复杂的问题。</p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <div>
+    
+    </div>
+    
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/27/Web%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%A5%E5%8F%8AWKWebView/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wendyzy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wendyzy的blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/06/27/Web%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%A5%E5%8F%8AWKWebView/" itemprop="url">Web基础知识以及WKWebView</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-27T22:36:40+08:00">
+                2020-06-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>categories: iOS</p>
+<h2 id="Web基础知识"><a href="#Web基础知识" class="headerlink" title="Web基础知识"></a>Web基础知识</h2><p>网络请求：网址 -&gt; 数据流<br>解析渲染：HTML CSS和Javascript</p>
+<h2 id="UIWebView和WKWebView的区别"><a href="#UIWebView和WKWebView的区别" class="headerlink" title="UIWebView和WKWebView的区别"></a>UIWebView和WKWebView的区别</h2><p>都基于WebKit进行的二次封装<br>WebKit 是一个开源的Web浏览器引擎</p>
+<img src="/2020/06/27/Web%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%A5%E5%8F%8AWKWebView/1.png" class>
+
+<h2 id="使用WKWebView"><a href="#使用WKWebView" class="headerlink" title="使用WKWebView"></a>使用WKWebView</h2><p>WKWebView提供一个UI的组件，可以load一个URL或者是HTML，WEWebVIew就会自动加载出整个页面逻辑，类似于UIView</p>
+<h3 id="基本的加载"><a href="#基本的加载" class="headerlink" title="基本的加载"></a>基本的加载</h3><ul>
+<li><p>通过 configuration 进⾏基本设置</p>
+<p>基本的共享 Cookie 设置<br>基础偏好设置<br>播放视频设置<br>默认JS注⼊入</p>
+</li>
+<li><p>加载 URL &amp; HTML</p>
+</li>
+<li><p>类⽐比之前的 UIKit 提供基础的功能，在 delegate 中处理理业务逻辑</p>
+</li>
+</ul>
+<h3 id="WKNavigationDelegate"><a href="#WKNavigationDelegate" class="headerlink" title="WKNavigationDelegate"></a>WKNavigationDelegate</h3><blockquote>
+<p>监管url的加载流程</p>
+</blockquote>
+<p>加载一个request<br>请求是否加载<br>是否已经加载好<br>加载是否失败，若加载失败，显示失败的crash回调<br>crash回调，重新加载</p>
+<h3 id="WKUIDelegate"><a href="#WKUIDelegate" class="headerlink" title="WKUIDelegate"></a>WKUIDelegate</h3><blockquote>
+<p>处理页面常用js逻辑，自定义url样式</p>
+</blockquote>
+<img src="/2020/06/27/Web%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%A5%E5%8F%8AWKWebView/2.png" class>
+
+<h2 id="WKWebView简单实例"><a href="#WKWebView简单实例" class="headerlink" title="WKWebView简单实例"></a>WKWebView简单实例</h2><blockquote>
+<p>在新闻界面的每一个row点击的时候，推进一个Detail界面（WKWebView），使用WKWebView加载其中的每一个url</p>
+</blockquote>
+<h3 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h3><p>创建 WKWebView 一个实例（懒加载） 设置其frame（注意navigation的导航栏）<br>设置Delegate 以及样式、JS注入等<br>加载URL 或者 HTML 等封装网址<br>配置TableVIew的每一个row<br>在相应的回调中处理业务逻辑</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/06/27/Web%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%A5%E5%8F%8AWKWebView/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <div>
+    
+    </div>
+    
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/27/UIGestureRecognizer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wendyzy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wendyzy的blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/06/27/UIGestureRecognizer/" itemprop="url">UIGestureRecognizer</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-27T21:09:02+08:00">
+                2020-06-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="UIGestureRecognizer"><a href="#UIGestureRecognizer" class="headerlink" title="UIGestureRecognizer"></a>UIGestureRecognizer</h1><p>支持在任何的UIView子视图上</p>
+<h2 id="手势封装"><a href="#手势封装" class="headerlink" title="手势封装"></a>手势封装</h2><p>六大手势<br>采用Target-Action方式处理</p>
+<h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><p>创建手势<br>实现响应处理<br>在视图中添加手势</p>
+<h2 id="UIGestureRecognizerDelegate"><a href="#UIGestureRecognizerDelegate" class="headerlink" title="UIGestureRecognizerDelegate"></a>UIGestureRecognizerDelegate</h2><h3 id="手势的不同阶段UIGestureRecognizerState"><a href="#手势的不同阶段UIGestureRecognizerState" class="headerlink" title="手势的不同阶段UIGestureRecognizerState"></a>手势的不同阶段UIGestureRecognizerState</h3><p>通过Delegate的方式扩展手势识别过程中的自定义操作</p>
+<ul>
+<li>手势是否要被响应</li>
+<li>是否支持多手势</li>
+<li>多个手势冲突时如何处理</li>
+</ul>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <div>
+    
+    </div>
+    
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/27/UICollectionView/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wendyzy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wendyzy的blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/06/27/UICollectionView/" itemprop="url">UICollectionView</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-27T19:52:33+08:00">
+                2020-06-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="UICollectionView"><a href="#UICollectionView" class="headerlink" title="UICollectionView"></a>UICollectionView</h1><p>适用于实现瀑布流样式，与UITableView一样都有相同的API设计理念，基于dataSource与delegate驱动</p>
+<ul>
+<li><p>row ——&gt; item</p>
+<p>由于⼀一⾏行行可以展示多个视图，row 不不能准确的表达</p>
+</li>
+</ul>
+<h2 id="UICollectionViewDataSource"><a href="#UICollectionViewDataSource" class="headerlink" title="UICollectionViewDataSource"></a>UICollectionViewDataSource</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">numberOfItemsInSection:(NSInteger)section;</span><br><span class="line">cellForItemAtIndexPath:(NSIndexPath *)indexPath;</span><br></pre></td></tr></table></figure>
+
+<h2 id="UICollectionViewDelegate"><a href="#UICollectionViewDelegate" class="headerlink" title="UICollectionViewDelegate"></a>UICollectionViewDelegate</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">willDisplayCell &#x2F; endDisplayCell ...</span><br><span class="line"></span><br><span class="line">- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath;</span><br></pre></td></tr></table></figure>
+
+<h2 id="UICollectionViewLayout"><a href="#UICollectionViewLayout" class="headerlink" title="UICollectionViewLayout"></a>UICollectionViewLayout</h2><h2 id="UIScrollerView"><a href="#UIScrollerView" class="headerlink" title="UIScrollerView"></a>UIScrollerView</h2><p>需要delegate</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <div>
+    
+    </div>
+    
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/27/delegate%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%8EUITableView/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wendyzy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wendyzy的blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/06/27/delegate%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%8EUITableView/" itemprop="url">delegate设计模式与UITableView</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-27T19:40:00+08:00">
+                2020-06-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>categories: iOS</p>
+ <img src="/2020/06/27/delegate%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%8EUITableView/1.png" class>
+
+<p>举个例子：geektime项目中的UITabarController的delegate来实现切换每个Tabar视图的操作</p>
+<h3 id="大概步骤"><a href="#大概步骤" class="headerlink" title="大概步骤"></a>大概步骤</h3><ol>
+<li>声明delegate 使用&lt;&gt;</li>
+<li>设置delegate = self</li>
+<li>实现delegate中的required方法</li>
+</ol>
+<p>再来一个🌰：UITableView</p>
+<h2 id="UITableView"><a href="#UITableView" class="headerlink" title="UITableView"></a>UITableView</h2><img src="/2020/06/27/delegate%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%8EUITableView/2.png" class>
+
+<p>其中的UITableViewDataSource与UITableViewDelegate值得仔细想想</p>
+<h2 id="UITableViewDataSource"><a href="#UITableViewDataSource" class="headerlink" title="UITableViewDataSource"></a>UITableViewDataSource</h2><img src="/2020/06/27/delegate%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%8EUITableView/3.png" class>
+
+<p>dataSource：和数据相关的delegate</p>
+<h3 id="查看其required函数方法并实现"><a href="#查看其required函数方法并实现" class="headerlink" title="查看其required函数方法并实现"></a>查看其required函数方法并实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section; &#x2F;&#x2F;返回列表中有多少个cell，控制行数</span><br><span class="line">- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath; &#x2F;&#x2F;仔细阅读注解，设置cell样式。系统默认提供四种cell样式，注意设置cell的id以及其复用</span><br></pre></td></tr></table></figure>
+
+<h3 id="UITableViewCell的重用"><a href="#UITableViewCell的重用" class="headerlink" title="UITableViewCell的重用"></a>UITableViewCell的重用</h3><img src="/2020/06/27/delegate%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%8EUITableView/4.png" class>
+
+<p>cell回收池使tableView的cell数量维持在一个稳定的区间内，即为可视区的cell数量<br>使用reuseIdentifier实现复用逻辑 dequeue……方法</p>
+<h3 id="指定操作cell"><a href="#指定操作cell" class="headerlink" title="指定操作cell"></a>指定操作cell</h3><p>section相当于章，row相当于节，两者都从0开始计算<br>NSIndexPath、NSInteger：indexPath.row索引至特定的row</p>
+<img src="/2020/06/27/delegate%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%8EUITableView/5.png" class>
+
+
+
+<h2 id="UITableViewDelegate"><a href="#UITableViewDelegate" class="headerlink" title="UITableViewDelegate"></a>UITableViewDelegate</h2><img src="/2020/06/27/delegate%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%8EUITableView/6.png" class>
+
+<p>设置高度、定义点击事件等</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>NavigationController的title等属性</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <div>
+    
+    </div>
+    
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/27/iOS%E4%B8%AD%E7%9A%84MVC%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wendyzy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wendyzy的blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/06/27/iOS%E4%B8%AD%E7%9A%84MVC%E6%A8%A1%E5%BC%8F/" itemprop="url">iOS中的MVC模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-27T17:16:49+08:00">
+                2020-06-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="iOS中的mvc模式"><a href="#iOS中的mvc模式" class="headerlink" title="iOS中的mvc模式"></a>iOS中的mvc模式</h1><blockquote>
+<p>数据、视图、控制<br>所有的视图都通过UIView来展示，UIView渲染视图<br>所有的管理都通过UIController来实现</p>
+</blockquote>
+<h2 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h2><h3 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h3><p>大小、位置：bounds、frame</p>
+<h3 id="UIView的生命周期："><a href="#UIView的生命周期：" class="headerlink" title="UIView的生命周期："></a>UIView的生命周期：</h3><p>多个视图：使用栈管理全部的子View</p>
+<p>单个视图：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;最先init</span><br><span class="line">\- (**void**)willMoveToSuperview:(**nullable** UIView *)newSuperview; \\第一步，对应addSubView()</span><br><span class="line">\- (**void**)didMoveToSuperview;\\第二步</span><br><span class="line">\- (**void**)willMoveToWindow:(**nullable** UIWindow *)newWindow;\\第三步</span><br><span class="line">\- (**void**)didMoveToWindow;\\第四步</span><br></pre></td></tr></table></figure>
+
+<p>控制台中，UIView的生命周期按照下面顺序执行，并且willMoveToSuperview和didMoveToSuperview、willMoveToWindow和didMoveToWindow成对出现。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">init</span><br><span class="line">willMoveToSuperview</span><br><span class="line">didMoveToSuperview</span><br><span class="line">willMoveToWindow</span><br><span class="line">didMoveToWindow</span><br></pre></td></tr></table></figure>
+
+<p>Windows是个容器, 本身不可见, 是用来盛放View的，Window继承自View，iOS程序里面，window是程序视图层次体系的最高层。所有能看到的view，都是要加到这个window上才能被看到。</p>
+<p>view和它的super view,subviews构成了一个树形结构叫做view hierarchy,即view的层级树。一个view先add到其superview，再与其superview一起粘贴到相应的window中</p>
+<h2 id="UIViewController"><a href="#UIViewController" class="headerlink" title="UIViewController"></a>UIViewController</h2><p>主要管理View的层级结构，自己也包含一个View</p>
+<h3 id="主要作用"><a href="#主要作用" class="headerlink" title="主要作用"></a>主要作用</h3><ul>
+<li><p>自身包含View，相当于一个容器</p>
+</li>
+<li><p>响应用户操作</p>
+<blockquote>
+<p>参考链接：<a href="https://www.jianshu.com/p/ff3a1b4995a6" target="_blank" rel="noopener">视图控制器UIViewController</a></p>
+</blockquote>
+</li>
+</ul>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>断点调试：在模拟机中已运行也可以进行调试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@interface TestView : UIView		&#x2F;&#x2F;TestView继承自UIView</span><br><span class="line">  &#x2F;&#x2F;定义属性等</span><br><span class="line">@end</span><br><span class="line">@implementation TestView</span><br><span class="line">  &#x2F;&#x2F;对视图执行操作方法</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+
+
 
           
         
@@ -945,7 +1789,7 @@
               
                 <a href="/archives/%20%7C%7C%20archive">
               
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -953,15 +1797,6 @@
 
             
 
-            
-              
-              
-              <div class="site-state-item site-state-tags">
-                
-                  <span class="site-state-item-count">1</span>
-                  <span class="site-state-item-name">标签</span>
-                
-              </div>
             
 
           </nav>
