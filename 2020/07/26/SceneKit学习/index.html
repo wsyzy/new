@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Scene Kit_1    基础1.什么是物理引擎​        物理引擎通过为刚性物体赋予真实的物理属性的方式来计算运动、旋转和碰撞反映。创建3D场景并添加至应用程序,提供基础的物理模拟,粒子效果,定义了虚拟的三维世界的自然规律.SceneKit(SK)是WWDC12推出的OS X平台的Cocos 3D渲染引擎框架。支持粒子效果，物理模拟，脚本事件，多程渲染，支持iOS平台。     SCN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SceneKit学习">
+<meta property="og:url" content="http://yoursite.com/2020/07/26/SceneKit%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wendyzy的blog">
+<meta property="og:description" content="Scene Kit_1    基础1.什么是物理引擎​        物理引擎通过为刚性物体赋予真实的物理属性的方式来计算运动、旋转和碰撞反映。创建3D场景并添加至应用程序,提供基础的物理模拟,粒子效果,定义了虚拟的三维世界的自然规律.SceneKit(SK)是WWDC12推出的OS X平台的Cocos 3D渲染引擎框架。支持粒子效果，物理模拟，脚本事件，多程渲染，支持iOS平台。     SCN">
+<meta property="og:image" content="http://yoursite.com/2020/07/26/SceneKit%E5%AD%A6%E4%B9%A0/1.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/26/SceneKit%E5%AD%A6%E4%B9%A0/2.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/26/SceneKit%E5%AD%A6%E4%B9%A0/3.png">
+<meta property="article:published_time" content="2020-07-26T10:51:53.000Z">
+<meta property="article:modified_time" content="2020-07-26T10:59:58.364Z">
+<meta property="article:author" content="Wendyzy">
+<meta property="article:tag" content="iOS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/07/26/SceneKit%E5%AD%A6%E4%B9%A0/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/07/26/SceneKit学习/"/>
+
+
+
+
+
+  <title>SceneKit学习 | Wendyzy的blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/wsyzy" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wendyzy的blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />
+            
+            日程表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/26/SceneKit%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wendyzy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wendyzy的blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SceneKit学习</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-26T18:51:53+08:00">
+                2020-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Scene-Kit-1-基础"><a href="#Scene-Kit-1-基础" class="headerlink" title="Scene Kit_1    基础"></a>Scene Kit_1    基础</h1><h2 id="1-什么是物理引擎"><a href="#1-什么是物理引擎" class="headerlink" title="1.什么是物理引擎"></a>1.什么是物理引擎</h2><p>​        物理引擎通过为刚性物体赋予真实的物理属性的方式来计算运动、旋转和<a href="https://baike.baidu.com/item/碰撞/33133" target="_blank" rel="noopener">碰撞</a>反映。创建3D场景并添加至应用程序,提供基础的物理模拟,粒子效果,定义了虚拟的三维世界的自然规律.SceneKit(SK)是WWDC12推出的OS X平台的Cocos 3D渲染引擎框架。支持粒子效果，物理模拟，脚本事件，多程渲染，支持iOS平台。</p>
+<img src="/2020/07/26/SceneKit%E5%AD%A6%E4%B9%A0/1.png" class>
+
+
+
+<h2 id="SCNView"><a href="#SCNView" class="headerlink" title="SCNView"></a>SCNView</h2><blockquote>
+<p> <em>在macOS中，SCNView是NSView的子类，在iOS和tvOS中，SCNView是UIView的子类。SCNView用于显示SceneKit的3D场景，而需要设置场景的相关内容和属性需要通过SCNScene。SCNView需要遵循SCNSceneRenderer协议和SCNTechniqueSupport协议。</em></p>
+</blockquote>
+<ul>
+<li><p>allowsCameraControl</p>
+<p>​    允许操纵相机，用户可以改变视角的位置和方向</p>
+<p>​    <em><a href="https://www.cnblogs.com/xianfeng-zhang/p/8967544.html" target="_blank" rel="noopener">SCNView</a></em></p>
+</li>
+<li><p>showsStatistics</p>
+<p>​    一个布尔值，确定SceneKit是否在附件视图中显示渲染性能统计信息。</p>
+<p>​    SceneKit统计信息视图显示有关场景渲染性能和GPU资源使用情况的各种信息，包括每秒帧数（fps）计数器。在macOS中，单击统计视图中的齿轮按钮以显示一个面板，其中包含用于调整SceneKit场景渲染的其他控件。</p>
+</li>
+<li><p>SceneKit的坐标系</p>
+<img src="/2020/07/26/SceneKit%E5%AD%A6%E4%B9%A0/2.png" class>
+
+<p>​       SceneKit使用右手坐标系，其中（默认情况下）视图的方向沿着负z轴，如果需要与其他3D框架共享数据，先了解其框架是右手坐标系还是左手坐标系。其实也很好转化，就是Z 轴的正负不一样而已。</p>
+</li>
+</ul>
+<h2 id="SCNScene"><a href="#SCNScene" class="headerlink" title="SCNScene"></a>SCNScene</h2><blockquote>
+<p> <strong>SCNScene对象表示三维场景及其内容</strong>,添加各种元素到场景,读取场景文件,将场景写入文件等。节点组成的层级结构（树形结构）构成整个场景的骨架，相机、灯光、几何体等“内容”附着在节点上，这些节点以及附着在节点上属性，构成了一个可见的3D场景。通俗说是游戏场景.</p>
+</blockquote>
+<h2 id="SCNNode"><a href="#SCNNode" class="headerlink" title="SCNNode"></a>SCNNode</h2><blockquote>
+<p> 在SCeneKit 中节点是一个抽象概念,节点是看不见摸不着的东西,没有几何形状,但是有位置,及其自身坐标.在场景中创建一个节点后,就可以在这个节点上放游戏元素了.比如任务模型,灯光,摄像机等.节点上可以添加子节点,每个SCNScene提供一个根结点作为层级结构的顶层</p>
+</blockquote>
+<ul>
+<li>name属性:与节点关联的名称,以使管理场景图更容易。从场景文件加载的节点可能具有艺术家使用三维创作工具指定的名称。使用childNode(withName:递归：）或childNodes（passingTest:）等方法时需要按名称从场景图中检索节点</li>
+</ul>
+<h3 id="1-SCNLight"><a href="#1-SCNLight" class="headerlink" title="1. SCNLight"></a>1. SCNLight</h3><p>用于添加光源，连接到一个节点照亮现场，可以给场景添加不同的灯光，模拟逼真的环境</p>
+<ul>
+<li><p>境光(Ambient light)：环境光源是控制场景整体亮度的源头。</p>
+</li>
+<li><p>位光(Omni light)：白天天空中的明亮的光芒 - 太阳 - 基本上是全能的光,向四周提供亮光</p>
+</li>
+<li><p>向光(Directional light)：这种类型在特定方向发射平行光线。</p>
+</li>
+<li><p>源(Sopt light)：这种类型的光也是定向的，但是光从空间中的单个点发射并且以锥形展开。</p>
+<p><a href="http://www.mamicode.com/info-detail-2291693.html" target="_blank" rel="noopener">SCNLight</a></p>
+<hr>
+<h3 id="2-SCNVector3"><a href="#2-SCNVector3" class="headerlink" title="2. SCNVector3"></a>2. SCNVector3</h3></li>
+</ul>
+<blockquote>
+<p>三分失向量的一种表示.SceneKit用于多种用途，例如描述节点或顶点位置、曲面法线以及缩放或平移转换。应根据使用矢量的上下文来解释不同的矢量组件。SceneKit中的坐标以m为单位</p>
+<p><a href="https://developer.apple.com/documentation/scenekit/scnvector3" target="_blank" rel="noopener">官方文档</a></p>
+</blockquote>
+<h3 id="3-SCNCamera"><a href="#3-SCNCamera" class="headerlink" title="3. SCNCamera"></a>3. SCNCamera</h3><blockquote>
+<p>一组摄像机属性，可以连接到一个节点，以提供显示场景的角度。</p>
+<p><strong>若要显示场景，必须将其“摄影机”属性包含摄影机对象的节点指定为视点</strong>。 包含摄影机的SCNNode对象定义了一个视点，即摄影机的位置和方向。<strong>摄影机的视图方向始终沿节点局部坐标系的负z轴</strong>。若要将摄影机指向场景的不同部分，请使用包含摄影机的节点的“位置”、“旋转”或“变换”属性。（或者，<em>要确保摄影机始终指向场景中的特定元素</em>，即使该元素移动，请将SCNLookAtConstraint对象附加到包含摄影机的节点。） SCNCamera对象本身定义了从其角度看渲染场景的形状和部分外观。默认情况下，相机定义透视投影，使用“调整相机透视”中列出的属性（如下图所示）可以控制透视投影的视野（FOV）和远近可见性限制。</p>
+</blockquote>
+<h3 id="4-SCNGeometry"><a href="#4-SCNGeometry" class="headerlink" title="4. SCNGeometry"></a>4. SCNGeometry</h3><ul>
+<li><h5 id="SCNBox中的chamferRadius为可动画的倒角半径"><a href="#SCNBox中的chamferRadius为可动画的倒角半径" class="headerlink" title="SCNBox中的chamferRadius为可动画的倒角半径"></a>SCNBox中的chamferRadius为可动画的倒角半径</h5></li>
+</ul>
+<blockquote>
+<p>最大拐角半径是盒子最小尺寸的一半。例如，如果一个盒子的宽度和长度均为5.0，高度为10.0，则其最大角半径为2.5。在这些尺寸下，盒子的四个圆形垂直边缘连接在一起形成一个圆柱体，并且其垂直面消失了。将拐角半径增加到最大值以上不会产生可见效果</p>
+</blockquote>
+<ul>
+<li><h5 id="geometry-materials-first-diffuse-contents-color-表示这对几何图形的内容进行赋值"><a href="#geometry-materials-first-diffuse-contents-color-表示这对几何图形的内容进行赋值" class="headerlink" title="geometry.materials.first?.diffuse.contents = color 表示这对几何图形的内容进行赋值"></a>geometry.materials.first?.diffuse.contents = color 表示这对几何图形的内容进行赋值</h5></li>
+<li><h6 id="plane-materials-first-isDoubleSided-true"><a href="#plane-materials-first-isDoubleSided-true" class="headerlink" title="plane.materials.first?.isDoubleSided = true"></a>plane.materials.first?.isDoubleSided = <strong>true</strong></h6><p>​        当此属性的值为false(默认值)时，SceneKit将使用来自一侧的材料呈现表面。几何中的顶点数据和法线向量指定每个多边形的哪一侧被认为是它的正面，而该几何图形相对于摄像机的方向决定了当前可见的前表面。如果将此属性的值更改为“是”，则SceneKit将呈现每个多边形的前表面和后表面。SceneKit假设曲面法线是正面法线向量的负值。可以对此属性值进行动画更改。</p>
+</li>
+</ul>
+<p>  <em><a href="https://www.cnblogs.com/demodashi/p/8481647.html" target="_blank" rel="noopener">[SceneKit] 不会 Unity3D 的另一种选择</a></em></p>
+<hr>
+<h3 id="5-SCNPhysicsBody"><a href="#5-SCNPhysicsBody" class="headerlink" title="5. SCNPhysicsBody"></a>5. SCNPhysicsBody</h3><blockquote>
+<ul>
+<li><p><strong>附加到场景图节点的物理模拟属性</strong>.</p>
+</li>
+<li><p>当SceneKit准备渲染新框架时，它将对附着到场景节点上的物理实体执行物理计算。这些计算包括重力，摩擦以及与其他物体的碰撞。您还可以对body施加自己的力量和冲力。SceneKit完成这些计算后，它将在渲染框架之前更新节点对象的位置和方向。</p>
+</li>
+<li><p>要将物理学添加到节点，请创建并配置一个对象，然后将其分配给该对象的属性。在向节点对象施加力或脉冲之前，它必须与它关联</p>
+</li>
+</ul>
+</blockquote>
+<ul>
+<li><p>tyoe: </p>
+<p>​    确定<strong>模拟中物体与力和其他物体的交互方式</strong>。<strong><em>静态</em>物体</strong>不受力和碰撞的影响，并且不能移动。<strong><em>动态</em>物体</strong>会受力以及与其他物体碰撞的影响。<strong><em>运动</em>(kinetic)物体</strong>不受力或碰撞的影响，但是直接移动运动物体会导致碰撞，从而影响动态物体。</p>
+</li>
+<li><p><strong>physicalShape</strong></p>
+<p>​    碰撞检测目的的三维实体形式,使用简单的形状而不是节点可见几何的精细细节时，物理模拟的运行速度更快.当SceneKit 对场景中的对象执行接触检测和其他模拟时，它将使用物理形状而不是可见对象的渲染几何形状。这种方法可以提高模拟性能，</p>
+</li>
+<li><p>mass属性</p>
+<p>body的质量,以千克为单位.物体的质量会影响其动量以及其对力的反应方式。动态物体的默认质量为1.00。静态和运动物体的默认质量为0.00，但是这些物体不受质量的影响。</p>
+<hr>
+<h4 id="创建SCNPhysicsBody"><a href="#创建SCNPhysicsBody" class="headerlink" title="创建SCNPhysicsBody"></a>创建SCNPhysicsBody</h4><ul>
+<li><p>staticBody</p>
+</li>
+<li><p>dynamicBody</p>
+</li>
+<li><p>kinematicBody</p>
+<h4 id="定义力如何影响物体"><a href="#定义力如何影响物体" class="headerlink" title="定义力如何影响物体"></a>定义力如何影响物体</h4></li>
+<li><p>(physicsShape)碰撞检测中物体的形状</p>
+</li>
+<li><p>(SCNPhysicsBodyType)物体的类型，枚举类型</p>
+</li>
+<li><p>移动、旋转</p>
+<h4 id="定义物体属性"><a href="#定义物体属性" class="headerlink" title="定义物体属性"></a>定义物体属性</h4></li>
+<li><p>mass</p>
+</li>
+<li><p>charge</p>
+</li>
+<li><p>friction</p>
+</li>
+<li><p>rollingFriction</p>
+</li>
+<li><p>(弹性)restitution</p>
+</li>
+<li><p>(移动阻尼)damping</p>
+</li>
+<li><p>(旋转阻尼)影响物体在旋转中的阻力。默认值是0.1</p>
+</li>
+<li><p>(惯性矩阵)SceneKit会根据物体的形状和质量自动确定惯性矩阵</p>
+<h4 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h4></li>
+<li><p>categoryBitMask</p>
+</li>
+<li><p>contactTestBitMask</p>
+</li>
+<li><p>collisionBitMask</p>
+<h4 id="用力-applyForce"><a href="#用力-applyForce" class="headerlink" title="用力(applyForce)"></a>用力(applyForce)</h4></li>
+<li><p>direction：力的大小和方向<code></code>impulse：YES，施加的是冲量；NO，施加的是力</p>
+</li>
+<li><p>(SCNVector3)direction atPosition:(SCNVector3)position impulse:(BOOL)impulse;力或冲量</p>
+</li>
+<li><p>(SCNVector4)torque impulse:(BOOL)impulse; 给物体施加一个扭矩（旋转的力）或角动量（旋转的冲量</p>
+</li>
+<li><p>(void)clearAllForces;取消所有持续的力或扭矩</p>
+<h4 id="管理物理运动"><a href="#管理物理运动" class="headerlink" title="管理物理运动"></a>管理物理运动</h4></li>
+<li><p>SCNVector3 velocity  物体当前运动速度(米/秒)和方向</p>
+</li>
+<li><p>SCNVector4 angularVelocity  物体当前的旋转轴和旋转速度（弧度/秒）</p>
+</li>
+<li><p>isResting 物体是否出于静止状态</p>
+</li>
+<li><p>allowsResting 是否自动将物体设置为“静止”</p>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="SceneKit学习-2-捕获几何体"><a href="#SceneKit学习-2-捕获几何体" class="headerlink" title="SceneKit学习_2    捕获几何体"></a>SceneKit学习_2    捕获几何体</h1><blockquote>
+<p>为结点添加物理效果</p>
+</blockquote>
+<img src="/2020/07/26/SceneKit%E5%AD%A6%E4%B9%A0/3.png" class>
+
+
+
+<ul>
+<li><h3 id="categoryBitMask"><a href="#categoryBitMask" class="headerlink" title="categoryBitMask"></a>categoryBitMask</h3><p>​        分类位掩码,定义了这个物体所属的类别.</p>
+<p>​        您可以将场景中的每个节点分配给一个或多个类别，其中每个类别对应于位掩码中的一位。您可以定义应用中使用的掩码值。当SceneKit渲染场景时，它使用<strong>逐位AND运算</strong>将每个节点的属性与参与渲染过程的每个其他对象的类别位掩码（灯光，照相机和技术）进行比较。如果<strong>结果为非零值，则SceneKit会在渲染时包括该节点</strong>。默认类别位掩码为1。</p>
+</li>
+<li><h3 id="collisionBitMask"><a href="#collisionBitMask" class="headerlink" title="collisionBitMask"></a>collisionBitMask</h3><p>​        一个定义哪个类型的physics body可以和这个类型的physics body碰撞的掩码(mask)</p>
+<p>​        当两个物体相互接触时就可能产生碰撞.SceneKit通过按位与运算将该body的collision mask和其他body的category mask进行比较.如果结果非零值,那么这个body就会受碰撞影响.每个body都需要独立地选择是否收其他的body碰撞影响.例如，您可能选择避免碰撞计算，这将使物体的速度变化可以忽略不计。</p>
+<p>​        默认值为all（一个位掩码，其每一位都被启用），该body将与所有其他类别的body产生碰撞。</p>
+</li>
+<li><h3 id="contactTestBitMask"><a href="#contactTestBitMask" class="headerlink" title="contactTestBitMask"></a>contactTestBitMask</h3><p>​        接触测试位掩码.当两个物理物体重叠时，可能会发生接触。</p>
+<p>​        SceneKit通过执行按位与运算，将body的contact mask与其他body的category mask进行比较。如果结果为非零值，SceneKit将创建一个SCNphysicsContact的对象，并将消息发送到物理场景世界中的contactDelegate对象。为了获得最佳性能，请仅在你想要交互的contact mask中设置位.在OS X v10.11或iOS 9或更高版本上运行的应用程序，此属性的值默认为零，并且不需要与碰撞掩码(collisionBitMask)匹配-也就是说，只要两个body相交，这一对body就会生成联系消息，无论它们是否碰撞或只是穿过彼此</p>
+</li>
+<li><p>SFSymbol</p>
+</li>
+</ul>
+<h1 id="SceneKit-3-粒子系统"><a href="#SceneKit-3-粒子系统" class="headerlink" title="SceneKit_3 粒子系统"></a>SceneKit_3 粒子系统</h1><p>​    <a href="https://juejin.im/post/5a3228736fb9a0451e3fd1f0" target="_blank" rel="noopener">粒子属性控制面板说明</a></p>
+<p>​    <a href="https://juejin.im/post/5a322530f265da43062ac948" target="_blank" rel="noopener">SceneKit专题</a></p>
+<a id="more"></a>
+
+
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <div>
+    
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------　　　　本文结束　<i class="fa fa-heart"></i>　感谢您的阅读　　　　-------------</div>
+    
+</div>
+    
+    </div>
+    
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/24/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="next" title="iOS内存管理机制">
+                <i class="fa fa-chevron-left"></i> iOS内存管理机制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/07/26/Reveal4%E7%9A%84%E9%82%A3%E4%BA%9B%E5%9D%91/" rel="prev" title="Reveal4的那些坑">
+                Reveal4的那些坑 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wendyzy</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Scene-Kit-1-基础"><span class="nav-number">1.</span> <span class="nav-text">Scene Kit_1    基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-什么是物理引擎"><span class="nav-number">1.1.</span> <span class="nav-text">1.什么是物理引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SCNView"><span class="nav-number">1.2.</span> <span class="nav-text">SCNView</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SCNScene"><span class="nav-number">1.3.</span> <span class="nav-text">SCNScene</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SCNNode"><span class="nav-number">1.4.</span> <span class="nav-text">SCNNode</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-SCNLight"><span class="nav-number">1.4.1.</span> <span class="nav-text">1. SCNLight</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-SCNVector3"><span class="nav-number">1.4.2.</span> <span class="nav-text">2. SCNVector3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-SCNCamera"><span class="nav-number">1.4.3.</span> <span class="nav-text">3. SCNCamera</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-SCNGeometry"><span class="nav-number">1.4.4.</span> <span class="nav-text">4. SCNGeometry</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#SCNBox中的chamferRadius为可动画的倒角半径"><span class="nav-number">1.4.4.0.1.</span> <span class="nav-text">SCNBox中的chamferRadius为可动画的倒角半径</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#geometry-materials-first-diffuse-contents-color-表示这对几何图形的内容进行赋值"><span class="nav-number">1.4.4.0.2.</span> <span class="nav-text">geometry.materials.first?.diffuse.contents &#x3D; color 表示这对几何图形的内容进行赋值</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#plane-materials-first-isDoubleSided-true"><span class="nav-number">1.4.4.0.2.1.</span> <span class="nav-text">plane.materials.first?.isDoubleSided &#x3D; true</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-SCNPhysicsBody"><span class="nav-number">1.4.5.</span> <span class="nav-text">5. SCNPhysicsBody</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建SCNPhysicsBody"><span class="nav-number">1.4.5.1.</span> <span class="nav-text">创建SCNPhysicsBody</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定义力如何影响物体"><span class="nav-number">1.4.5.2.</span> <span class="nav-text">定义力如何影响物体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定义物体属性"><span class="nav-number">1.4.5.3.</span> <span class="nav-text">定义物体属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分类"><span class="nav-number">1.4.5.4.</span> <span class="nav-text">分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#用力-applyForce"><span class="nav-number">1.4.5.5.</span> <span class="nav-text">用力(applyForce)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#管理物理运动"><span class="nav-number">1.4.5.6.</span> <span class="nav-text">管理物理运动</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SceneKit学习-2-捕获几何体"><span class="nav-number">2.</span> <span class="nav-text">SceneKit学习_2    捕获几何体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#categoryBitMask"><span class="nav-number">2.0.1.</span> <span class="nav-text">categoryBitMask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#collisionBitMask"><span class="nav-number">2.0.2.</span> <span class="nav-text">collisionBitMask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#contactTestBitMask"><span class="nav-number">2.0.3.</span> <span class="nav-text">contactTestBitMask</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SceneKit-3-粒子系统"><span class="nav-number">3.</span> <span class="nav-text">SceneKit_3 粒子系统</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共字</span>
+</div>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wendyzy</span>
+ 
+  <div class="powered-by">
+  </div>
+  
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count"></span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

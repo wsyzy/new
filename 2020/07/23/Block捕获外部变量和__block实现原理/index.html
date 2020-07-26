@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Block捕获外部变量和__block实现原理本文转载自：深入研究Block捕获外部变量和__block实现原理 Block是什么Block是C语言的扩充功能，用一句话来形容就是：带有自动变量的匿名函数。 Block有哪些特性捕获外部变量，Block捕获外部变量仅仅只捕获Block闭包里面会用到的值，其他用不到的值，它并不会去捕获。 若在Block中使用自动变量而不标__block，则会发生报错误">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Block捕获外部变量和__block实现原理">
+<meta property="og:url" content="http://yoursite.com/2020/07/23/Block%E6%8D%95%E8%8E%B7%E5%A4%96%E9%83%A8%E5%8F%98%E9%87%8F%E5%92%8C__block%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="Wendyzy的blog">
+<meta property="og:description" content="Block捕获外部变量和__block实现原理本文转载自：深入研究Block捕获外部变量和__block实现原理 Block是什么Block是C语言的扩充功能，用一句话来形容就是：带有自动变量的匿名函数。 Block有哪些特性捕获外部变量，Block捕获外部变量仅仅只捕获Block闭包里面会用到的值，其他用不到的值，它并不会去捕获。 若在Block中使用自动变量而不标__block，则会发生报错误">
+<meta property="og:image" content="http://yoursite.com/Users/qaq/Downloads/Block.png">
+<meta property="article:published_time" content="2020-07-23T06:16:33.436Z">
+<meta property="article:modified_time" content="2020-07-24T07:52:14.487Z">
+<meta property="article:author" content="Wendyzy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/Users/qaq/Downloads/Block.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/07/23/Block捕获外部变量和__block实现原理/"/>
+
+
+
+
+
+  <title>Block捕获外部变量和__block实现原理 | Wendyzy的blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/wsyzy" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wendyzy的blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />
+            
+            日程表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/23/Block%E6%8D%95%E8%8E%B7%E5%A4%96%E9%83%A8%E5%8F%98%E9%87%8F%E5%92%8C__block%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wendyzy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wendyzy的blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Block捕获外部变量和__block实现原理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-23T14:16:33+08:00">
+                2020-07-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Block捕获外部变量和-block实现原理"><a href="#Block捕获外部变量和-block实现原理" class="headerlink" title="Block捕获外部变量和__block实现原理"></a>Block捕获外部变量和__block实现原理</h1><p>本文转载自：<a href="https://juejin.im/post/57ccab0ba22b9d006ba26de1" target="_blank" rel="noopener">深入研究Block捕获外部变量和__block实现原理</a></p>
+<h2 id="Block是什么"><a href="#Block是什么" class="headerlink" title="Block是什么"></a>Block是什么</h2><p>Block是C语言的扩充功能，用一句话来形容就是：带有自动变量的匿名函数。</p>
+<h4 id="Block有哪些特性"><a href="#Block有哪些特性" class="headerlink" title="Block有哪些特性"></a>Block有哪些特性</h4><p>捕获外部变量，Block捕获外部变量仅仅只捕获Block闭包里面会用到的值，其他用不到的值，它并不会去捕获。</p>
+<p>若在Block中使用自动变量而不标__block，则会发生报错误：</p>
+<p><img src="/Users/qaq/Downloads/Block.png" alt="Block"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#import &lt;Foundation&#x2F;Foundation.h&gt;</span><br><span class="line"></span><br><span class="line">int global_i &#x3D; 1;</span><br><span class="line"></span><br><span class="line">static int static_global_j &#x3D; 2;</span><br><span class="line"></span><br><span class="line">int main(int argc, const char * argv[]) &#123; </span><br><span class="line">    static int static_k &#x3D; 3;</span><br><span class="line">    int val &#x3D; 4;</span><br><span class="line"></span><br><span class="line">    void (^myBlock)(void) &#x3D; ^&#123;</span><br><span class="line">        global_i ++;</span><br><span class="line">        static_global_j ++;</span><br><span class="line">        static_k ++;</span><br><span class="line">        NSLog(@&quot;Block中 global_i &#x3D; %d,static_global_j &#x3D; %d,static_k &#x3D; %d,val &#x3D; %d&quot;,global_i,static_global_j,static_k,val);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    global_i ++;</span><br><span class="line">    static_global_j ++;</span><br><span class="line">    static_k ++;</span><br><span class="line">    val ++;</span><br><span class="line">    NSLog(@&quot;Block外 global_i &#x3D; %d,static_global_j &#x3D; %d,static_k &#x3D; %d,val &#x3D; %d&quot;,global_i,static_global_j,static_k,val);</span><br><span class="line"></span><br><span class="line">    myBlock();</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>测试结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Block 外  global_i &#x3D; 2,static_global_j &#x3D; 3,static_k &#x3D; 4,val &#x3D; 5</span><br><span class="line">Block 中  global_i &#x3D; 3,static_global_j &#x3D; 4,static_k &#x3D; 5,val &#x3D; 4</span><br></pre></td></tr></table></figure>
+
+<h4 id="此处有三个问题"><a href="#此处有三个问题" class="headerlink" title="此处有三个问题"></a>此处有三个问题</h4><ol>
+<li>为什么在Block里面不加__bolck不允许更改变量？</li>
+<li>为什么自动变量的值没有增加，而其他几个变量的值是增加的？</li>
+<li>自动变量是什么状态下被block捕获进去的？</li>
+</ol>
+<h4 id="clang命令得到的源码："><a href="#clang命令得到的源码：" class="headerlink" title="clang命令得到的源码："></a>clang命令得到的源码：</h4><p><em>以下为将main.m用clang转换成main.cpp以后的源码</em></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">int</span> global_i = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> static_global_j = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">main_block_impl_0</span> &#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> __<span class="title">block_impl</span> <span class="title">impl</span>;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> __<span class="title">main_block_desc_0</span>* <span class="title">Desc</span>;</span></span><br><span class="line">  <span class="keyword">int</span> *static_k;</span><br><span class="line">  <span class="keyword">int</span> val;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//以下为__main_block_impl_0的构造函数，其中自动变量val和静态变量static_k被捕获为其成员变量</span></span><br><span class="line">  __main_block_impl_0(<span class="keyword">void</span> *fp, struct __main_block_desc_0 *desc, <span class="keyword">int</span> *_static_k, <span class="keyword">int</span> _val, <span class="keyword">int</span> flags=<span class="number">0</span>) : static_k(_static_k), val(_val) &#123;</span><br><span class="line"></span><br><span class="line">    impl.isa = &amp;_NSConcreteStackBlock;</span><br><span class="line">    impl.Flags = flags;</span><br><span class="line">    impl.FuncPtr = fp;</span><br><span class="line">    Desc = desc;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_func_0(struct __main_block_impl_0 *__cself) &#123;</span><br><span class="line">  <span class="keyword">int</span> *static_k = __cself-&gt;static_k; <span class="comment">// bound by copy，传递的是指针，即变量的内存地址</span></span><br><span class="line">  <span class="keyword">int</span> val = __cself-&gt;val; <span class="comment">// bound by copy，这里Block仅仅捕获了val的值，并没有捕获val的内存地址，也就是在这个函数中即使我们重写val的值也不会改变Block外面val的值</span></span><br><span class="line"></span><br><span class="line">        global_i ++;</span><br><span class="line">        static_global_j ++;</span><br><span class="line">        (*static_k) ++;</span><br><span class="line">        NSLog((NSString *)&amp;__NSConstantStringImpl__var_folders_45_k1d9q7c52vz50wz1683_hk9r0000gn_T_main_6fe658_mi_0,global_i,static_global_j,(*static_k),val);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> __<span class="title">main_block_desc_0</span> &#123;</span></span><br><span class="line">  <span class="keyword">size_t</span> reserved;</span><br><span class="line">  <span class="keyword">size_t</span> Block_size;</span><br><span class="line">&#125; __main_block_desc_0_DATA = &#123; <span class="number">0</span>, <span class="keyword">sizeof</span>(struct __main_block_impl_0)&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> * argv[])</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> static_k = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">int</span> val = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">  myBlock闭包中的__main_block_impl_0结构体，初始化如下：</span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment">impl.isa = &amp;_NSConcreteStackBlock;</span></span><br><span class="line"><span class="comment">impl.Flags = 0;</span></span><br><span class="line"><span class="comment">impl.FuncPtr = __main_block_impl_0; </span></span><br><span class="line"><span class="comment">Desc = &amp;__main_block_desc_0_DATA;</span></span><br><span class="line"><span class="comment">*_static_k = 4；</span></span><br><span class="line"><span class="comment">val = 4;		//捕获到自动变量</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line">    <span class="keyword">void</span> (*myBlock)(<span class="keyword">void</span>) = ((<span class="keyword">void</span> (*)())&amp;__main_block_impl_0((<span class="keyword">void</span> *)__main_block_func_0, &amp;__main_block_desc_0_DATA, &amp;static_k, val));</span><br><span class="line"></span><br><span class="line">    global_i ++;</span><br><span class="line">    static_global_j ++;</span><br><span class="line">    static_k ++;</span><br><span class="line">    val ++;</span><br><span class="line">    NSLog((NSString *)&amp;__NSConstantStringImpl__var_folders_45_k1d9q7c52vz50wz1683_hk9r0000gn_T_main_6fe658_mi_1,global_i,static_global_j,static_k,val);</span><br><span class="line"></span><br><span class="line">    ((<span class="keyword">void</span> (*)(__block_impl *))((__block_impl *)myBlock)-&gt;FuncPtr)((__block_impl *)myBlock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>自动变量没法在Block中改变外部变量的值，所以编译过程中就报如下编译错误：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Variable is not assignable(missing __block type specifier)</span><br></pre></td></tr></table></figure>
+
+<p>至此，上面提出的<strong>问题2 &amp; 3</strong>得到答案，Block第一个特性的小结如下：</p>
+<p>自动变量是<strong>以值传递方式</strong>传递到Block的构造函数里面去的。Block只捕获Block中会用到的变量。由于只捕获了自动变量的值而非内存地址，所以<strong>Block内部不能改变自动变量的值</strong>。Block捕获的外部变量可以改变值的是<strong>静态变量，静态全局变量，全局变量</strong>。</p>
+<p>再来看<strong>问题1</strong>的解决：</p>
+<ol>
+<li>（静态）全局变量存储在全局区，其作用域包含Block，所以可以在Block中被改变</li>
+<li>静态变量传递给Block的是内存地址值，所以也可以在Block中被改变</li>
+</ol>
+<p>为什么苹果要求我们在自动变量前加入<strong>block（</strong>block storage-class-specifier存储域类说明符）才可以在其中改变外部自动变量的值：因为这可以改变自动变量的存储区方式</p>
+<h2 id="Block的copy和dispose"><a href="#Block的copy和dispose" class="headerlink" title="Block的copy和dispose"></a>Block的copy和dispose</h2><blockquote>
+<p>copy函数把Block从栈上拷贝到堆上，dispose函数是把堆上的函数在废弃的时候销毁掉</p>
+</blockquote>
+<p>ios中常见的3种Block，在ARC环境下，3种类型都可以捕获外部变量。以下是否持有对象在MRC的环境下检测的。</p>
+<ul>
+<li><p>_NSConcreteStackBlock</p>
+<p>只用到外部局部变量、成员属性变量，且没有强指针引用的block。不持有对象。生命周期由系统控制的，一旦返回之后（所属的变量域一旦结束），就被系统销毁了。</p>
+</li>
+<li><p>_NSConcreteMallocBlock</p>
+<p> 有强指针引用或copy修饰的成员属性引用的block会被复制一份到堆中成为MallocBlock。持有对象。没有强指针引用即销毁，生命周期由程序员控制</p>
+</li>
+<li><p>_NSConcreteGlobalBlock</p>
+<p>没有用到外界变量或只用到全局变量、静态变量的block。不持有对象。生命周期从创建到应用程序结束</p>
+</li>
+</ul>
+<p>在ARC环境下，编译器会自动的判断，把Block自动的从栈copy到堆。下列4种情况，系统都会默认调用copy方法把Block复制</p>
+<ol>
+<li>手动调用copy</li>
+<li>Block是函数的返回值</li>
+<li>Block被强引用，即Block被赋值为__strong或者id型</li>
+<li>调用系统API入参中含有usingBlock的方法（注意除了系统提供的API我们不需要管之外，其他我们自定义的方法传递Block为参数的时候都需要手动copy一份到堆上）</li>
+</ol>
+<h2 id="Block中-block实现原理"><a href="#Block中-block实现原理" class="headerlink" title="Block中__block实现原理"></a>Block中__block实现原理</h2><p>使用__block </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#import &lt;Foundation&#x2F;Foundation.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line"></span><br><span class="line">    __block int i &#x3D; 0;</span><br><span class="line"></span><br><span class="line">    void (^myBlock)(void) &#x3D; ^&#123;</span><br><span class="line">        i ++;</span><br><span class="line">        NSLog(@&quot;%d&quot;,i);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    myBlock();</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>转换为源码为</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">//带有__block的变量被转化成的结构体__Block_byref_i_0，有5个成员变量</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">Block_byref_i_0</span> &#123;</span></span><br><span class="line">  <span class="keyword">void</span> *__isa;</span><br><span class="line">__Block_byref_i_0 *__forwarding; <span class="comment">//指向自身类型的_forwarding指针</span></span><br><span class="line"> <span class="keyword">int</span> __flags;<span class="comment">//标记</span></span><br><span class="line"> <span class="keyword">int</span> __size;<span class="comment">//大小</span></span><br><span class="line"> <span class="keyword">int</span> i; <span class="comment">//变量值，名字和变量名同名</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">main_block_impl_0</span> &#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> __<span class="title">block_impl</span> <span class="title">impl</span>;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> __<span class="title">main_block_desc_0</span>* <span class="title">Desc</span>;</span></span><br><span class="line">  __Block_byref_i_0 *i; <span class="comment">// by ref, 带有__block的变量被转化成了一个结构体__Block_byref_i_0,</span></span><br><span class="line">  __main_block_impl_0(<span class="keyword">void</span> *fp, struct __main_block_desc_0 *desc, __Block_byref_i_0 *_i, <span class="keyword">int</span> flags=<span class="number">0</span>) : i(_i-&gt;__forwarding) &#123;</span><br><span class="line">    impl.isa = &amp;_NSConcreteStackBlock;</span><br><span class="line">    impl.Flags = flags;</span><br><span class="line">    impl.FuncPtr = fp;</span><br><span class="line">    Desc = desc;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_func_0(struct __main_block_impl_0 *__cself) &#123;</span><br><span class="line">  __Block_byref_i_0 *i = __cself-&gt;i; <span class="comment">// bound by ref</span></span><br><span class="line"></span><br><span class="line">        (i-&gt;__forwarding-&gt;i) ++; <span class="comment">//__forwarding指针这里的作用就是针对堆的Block，把原来__forwarding指针指向自己，换成指向_NSConcreteMallocBlock上复制之后的__block自己。然后堆上的变量的__forwarding再指向自己。这样不管__block怎么复制到堆上，还是在栈上，都可以通过(i-&gt;__forwarding-&gt;i)来访问到变量值。</span></span><br><span class="line"></span><br><span class="line">        NSLog((NSString *)&amp;__NSConstantStringImpl__var_folders_45_k1d9q7c52vz50wz1683_hk9r0000gn_T_main_3b0837_mi_0,(i-&gt;__forwarding-&gt;i));</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_copy_0(struct __main_block_impl_0*dst, struct __main_block_impl_0*src) &#123;_Block_object_assign((<span class="keyword">void</span>*)&amp;dst-&gt;i, (<span class="keyword">void</span>*)src-&gt;i, <span class="number">8</span><span class="comment">/*BLOCK_FIELD_IS_BYREF*/</span>);&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_dispose_0(struct __main_block_impl_0*src) &#123;_Block_object_dispose((<span class="keyword">void</span>*)src-&gt;i, <span class="number">8</span><span class="comment">/*BLOCK_FIELD_IS_BYREF*/</span>);&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> __<span class="title">main_block_desc_0</span> &#123;</span></span><br><span class="line">  <span class="keyword">size_t</span> reserved;</span><br><span class="line">  <span class="keyword">size_t</span> Block_size;</span><br><span class="line">  <span class="keyword">void</span> (*copy)(struct __main_block_impl_0*, struct __main_block_impl_0*);</span><br><span class="line">  <span class="keyword">void</span> (*dispose)(struct __main_block_impl_0*);</span><br><span class="line">&#125; __main_block_desc_0_DATA = &#123; <span class="number">0</span>, <span class="keyword">sizeof</span>(struct __main_block_impl_0), __main_block_copy_0, __main_block_dispose_0&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//main（）</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> * argv[])</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">    __attribute__((__blocks__(byref))) __Block_byref_i_0 i = &#123;(<span class="keyword">void</span>*)<span class="number">0</span>,(__Block_byref_i_0 *)&amp;i, <span class="number">0</span>, <span class="keyword">sizeof</span>(__Block_byref_i_0), <span class="number">0</span>&#125;;<span class="comment">//初始化__Block_byref_i_0，此处__forwarding指针初始化传递的是自己的地址</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">void</span> (*myBlock)(<span class="keyword">void</span>) = ((<span class="keyword">void</span> (*)())&amp;__main_block_impl_0((<span class="keyword">void</span> *)__main_block_func_0, &amp;__main_block_desc_0_DATA, (__Block_byref_i_0 *)&amp;i, <span class="number">570425344</span>));</span><br><span class="line"></span><br><span class="line">    ((<span class="keyword">void</span> (*)(__block_impl *))((__block_impl *)myBlock)-&gt;FuncPtr)((__block_impl *)myBlock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ARC环境下，一旦Block赋值就会触发copy，<strong>block就会copy到堆上，Block也是</strong>NSMallocBlock。ARC环境下也是存在<strong>NSStackBlock的时候，这种情况下，</strong>block就在栈上。</p>
+<p>MRC环境下，只有copy，<strong>block才会被复制到堆上，否则，</strong>block一直都在栈上，block也只是<strong>NSStackBlock，这个时候\</strong>forwarding指针就只指向自己了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>捕获进Block的对象会被Block持有。</li>
+<li>自动变量的值，被copy进了Block，不带__block的自动变量只能在里面被访问，并不能改变值。</li>
+<li>带__block的自动变量 和 静态变量 就是直接地址访问。所以在Block里面可以直接改变变量的值。</li>
+<li>静态全局变量，全局变量，函数参数，可以在直接在Block中改变变量值，但是它们并不会被Block持有，也就是说不会增加retainCount值。</li>
+</ul>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="iOS中的isa"><a href="#iOS中的isa" class="headerlink" title="iOS中的isa"></a>iOS中的isa</h3><p>Objective-C 对象在底层本质上是结构体，所有的对象都包含一个isa属性，用来关联对象和存储一些对象的信息</p>
+<h3 id="Clang指令"><a href="#Clang指令" class="headerlink" title="Clang指令"></a>Clang指令</h3><p>Clang是一个由Apple主导编写，基于LLVM的C/C++/Objective-C编译器，将支持其普通<a href="https://baike.baidu.com/item/lambda表达式" target="_blank" rel="noopener">lambda表达式</a>、返回类型的简化处理以及更好的处理constexpr关键字。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <div>
+    
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------　　　　本文结束　<i class="fa fa-heart"></i>　感谢您的阅读　　　　-------------</div>
+    
+</div>
+    
+    </div>
+    
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/17/Use-of-unimplemented-initializer-init-frame-options/" rel="next" title="Use of unimplemented initializer 'init(frame:options:)">
+                <i class="fa fa-chevron-left"></i> Use of unimplemented initializer 'init(frame:options:)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/07/23/iOS%E7%9A%84NSNotification/" rel="prev" title="iOS的NSNotification">
+                iOS的NSNotification <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wendyzy</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Block捕获外部变量和-block实现原理"><span class="nav-number">1.</span> <span class="nav-text">Block捕获外部变量和__block实现原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Block是什么"><span class="nav-number">1.1.</span> <span class="nav-text">Block是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Block有哪些特性"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">Block有哪些特性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#此处有三个问题"><span class="nav-number">1.1.0.2.</span> <span class="nav-text">此处有三个问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#clang命令得到的源码："><span class="nav-number">1.1.0.3.</span> <span class="nav-text">clang命令得到的源码：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Block的copy和dispose"><span class="nav-number">1.2.</span> <span class="nav-text">Block的copy和dispose</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Block中-block实现原理"><span class="nav-number">1.3.</span> <span class="nav-text">Block中__block实现原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">1.5.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#iOS中的isa"><span class="nav-number">1.5.1.</span> <span class="nav-text">iOS中的isa</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Clang指令"><span class="nav-number">1.5.2.</span> <span class="nav-text">Clang指令</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共字</span>
+</div>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wendyzy</span>
+ 
+  <div class="powered-by">
+  </div>
+  
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count"></span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

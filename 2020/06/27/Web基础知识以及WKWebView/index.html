@@ -79,16 +79,17 @@
 
 
 
-<meta name="description" content="categories: iOS Web基础知识网络请求：网址 -&gt; 数据流解析渲染：HTML CSS和Javascript UIWebView和WKWebView的区别都基于WebKit进行的二次封装WebKit 是一个开源的Web浏览器引擎   使用WKWebViewWKWebView提供一个UI的组件，可以load一个URL或者是HTML，WEWebVIew就会自动加载出整个页面逻辑，类">
+<meta name="description" content="categories: iOS Web基础知识网络请求：网址 -&gt; 数据流解析渲染：HTML CSS和Javascript UIWebView和WKWebView的区别都基于WebKit进行的二次封装WebKit 是一个开源的Web浏览器引擎   使用WKWebViewWKWebView提供一个UI的组件，可以load一个URL或者是HTML，WEWebVIew就会自动加载出整个页面逻辑，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Web基础知识以及WKWebView">
 <meta property="og:url" content="http://yoursite.com/2020/06/27/Web%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%A5%E5%8F%8AWKWebView/index.html">
 <meta property="og:site_name" content="Wendyzy的blog">
-<meta property="og:description" content="categories: iOS Web基础知识网络请求：网址 -&gt; 数据流解析渲染：HTML CSS和Javascript UIWebView和WKWebView的区别都基于WebKit进行的二次封装WebKit 是一个开源的Web浏览器引擎   使用WKWebViewWKWebView提供一个UI的组件，可以load一个URL或者是HTML，WEWebVIew就会自动加载出整个页面逻辑，类">
+<meta property="og:description" content="categories: iOS Web基础知识网络请求：网址 -&gt; 数据流解析渲染：HTML CSS和Javascript UIWebView和WKWebView的区别都基于WebKit进行的二次封装WebKit 是一个开源的Web浏览器引擎   使用WKWebViewWKWebView提供一个UI的组件，可以load一个URL或者是HTML，WEWebVIew就会自动加载出整个页面逻辑，">
 <meta property="og:image" content="http://yoursite.com/2020/06/27/Web%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%A5%E5%8F%8AWKWebView/1.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/27/Web%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%A5%E5%8F%8AWKWebView/2.png">
+<meta property="og:image" content="http://yoursite.com/Users/qaq/Library/Application%20Support/typora-user-images/image-20200702185753698.png">
 <meta property="article:published_time" content="2020-06-27T14:36:40.380Z">
-<meta property="article:modified_time" content="2020-06-28T06:29:19.064Z">
+<meta property="article:modified_time" content="2020-07-03T04:53:09.049Z">
 <meta property="article:author" content="Wendyzy">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/2020/06/27/Web%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%A5%E5%8F%8AWKWebView/1.png">
@@ -372,7 +373,7 @@
       
 
       
-        <p>categories: iOS</p>
+        <p> categories: iOS</p>
 <h2 id="Web基础知识"><a href="#Web基础知识" class="headerlink" title="Web基础知识"></a>Web基础知识</h2><p>网络请求：网址 -&gt; 数据流<br>解析渲染：HTML CSS和Javascript</p>
 <h2 id="UIWebView和WKWebView的区别"><a href="#UIWebView和WKWebView的区别" class="headerlink" title="UIWebView和WKWebView的区别"></a>UIWebView和WKWebView的区别</h2><p>都基于WebKit进行的二次封装<br>WebKit 是一个开源的Web浏览器引擎</p>
 <img src="/2020/06/27/Web%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%A5%E5%8F%8AWKWebView/1.png" class>
@@ -400,6 +401,86 @@
 <p>在新闻界面的每一个row点击的时候，推进一个Detail界面（WKWebView），使用WKWebView加载其中的每一个url</p>
 </blockquote>
 <h3 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h3><p>创建 WKWebView 一个实例（懒加载） 设置其frame（注意navigation的导航栏）<br>设置Delegate 以及样式、JS注入等<br>加载URL 或者 HTML 等封装网址<br>配置TableVIew的每一个row<br>在相应的回调中处理业务逻辑</p>
+<h1 id="APP内基本网络流程"><a href="#APP内基本网络流程" class="headerlink" title="APP内基本网络流程"></a>APP内基本网络流程</h1><p>将网址等字符串按照不同的协议分装成相应的NSURL，在此基础上添加相应请求参数和设置（post、get等）。NSURL与这些参数和设置一起形成请求，即NSURLRequest，通过此请求调用服务器上的NSURLSession，根据NSURLSession提供的方法返回并接收服务器返回的数据</p>
+<p>![image-20200630153846855](/Users/qaq/Library/Application Support/typora-user-images/image-20200630153846855.png)</p>
+<h2 id="NSURL（Uniform-Resource-Locator，资源定位）"><a href="#NSURL（Uniform-Resource-Locator，资源定位）" class="headerlink" title="NSURL（Uniform Resource Locator，资源定位）"></a>NSURL（Uniform Resource Locator，资源定位）</h2><p>![image-20200630153905043](/Users/qaq/Library/Application Support/typora-user-images/image-20200630153905043.png)</p>
+<p>根据url特定格式解析的字串来定义参数，方便系统的调用以及coder的debug</p>
+<blockquote>
+<p>项目中debug封装了的NSURL的字段属性：</p>
+<p>![image-20200630160429901](/Users/qaq/Library/Application Support/typora-user-images/image-20200630160429901.png)</p>
+<p>如图，在控制台中输入 ```</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">po listURL.path &#x2F;listURL为定义的NSURL实例对象</span><br></pre></td></tr></table></figure>
+
+<p>![image-20200630160736955](/Users/qaq/Library/Application Support/typora-user-images/image-20200630160736955.png)</p>
+</blockquote>
+<h2 id="NSURLRequest"><a href="#NSURLRequest" class="headerlink" title="NSURLRequest"></a>NSURLRequest</h2><blockquote>
+<p>为什么需要request呢？</p>
+<p>http请求在携带地址时还会携带很多其他的数据，比如说请求方法，header（包含长度，编码类型、压缩方式、事件等）等等，而NSURL只是地址，需要生成请求以满足协议规范</p>
+</blockquote>
+<p>NSURLRequest对象就代表一个请求，包含NSURL对象、请求方法、请求头、请求体等等</p>
+<p>![image-20200630214436430](/Users/qaq/Library/Application Support/typora-user-images/image-20200630214436430.png)</p>
+<p>cachePolicy为缓存信息，timeoutInterval为超时信息</p>
+<p>![image-20200630214632704](/Users/qaq/Library/Application Support/typora-user-images/image-20200630214632704.png)</p>
+<p>HTTPMethod可以是post或者get方法，如果是post方法，还会需要body</p>
+<h2 id="控制台debug"><a href="#控制台debug" class="headerlink" title="控制台debug"></a>控制台debug</h2><p>![image-20200630215919732](/Users/qaq/Library/Application Support/typora-user-images/image-20200630215919732.png)</p>
+<h1 id="NSURLSession"><a href="#NSURLSession" class="headerlink" title="NSURLSession"></a>NSURLSession</h1><blockquote>
+<p>浏览器有无痕模式和普通模式，两种模式在加载数据请求上是一样的，但策略不一样。普通模式可以看到浏览历史，但是无痕模式不能看到请求历史以及保存不了cookie。系统提供NSURLSession来接收、发送和处理请求，一个session可以创建多个请求（类似于浏览器可以打开多个网页），一个APP可以有多个NSURLSession，NSURLSession可以将NSURLRequest封装为task进行请求接收，控制状态、开始取消、进度等，尽量让多个NSURLRequest用一个NSURLSession。</p>
+</blockquote>
+<h2 id="NSURLSession的组织结构"><a href="#NSURLSession的组织结构" class="headerlink" title="NSURLSession的组织结构"></a>NSURLSession的组织结构</h2><p>创建一个session需要相应的配置和策略，创建NSURLRequest使用NSURLSession封装成NSURLSessionTask来进行下载。同时可以使用NSURLSessionDelegate来进行分阶段回调。不同的session策略不同，即传递的configuration不同。如果只是普通加载网络请求，不需要自定义的session，系统提供默认的sharedSession</p>
+<p>![image-20200630222507240](/Users/qaq/Library/Application Support/typora-user-images/image-20200630222507240.png)</p>
+<p>创建完session后，在session中将request封装成task，之后再操作task进行网络的加载，同时使用delegate方法来监听网络加载请求的回调。task根据请求策略分为四种task，他们也为继承的层级结构关系。对于数据加载量较小的需求，可以使用基本的NSURLSessionDataTask</p>
+<p>![image-20200630223125972](/Users/qaq/Library/Application Support/typora-user-images/image-20200630223125972.png)</p>
+<h1 id="NSURLSessionTask"><a href="#NSURLSessionTask" class="headerlink" title="NSURLSessionTask"></a>NSURLSessionTask</h1><blockquote>
+<p>task总共有resume（恢复），suspend（挂起），cancel（取消）三种状态。创建好的sessionTask默认是suspend状态，调用resume开始执行</p>
+</blockquote>
+<p>![image-20200630224702258](/Users/qaq/Library/Application Support/typora-user-images/image-20200630224702258.png)</p>
+<p>sessionTask可以标识出自己现在所处的状态（NSURLSessionTaskState为0或1或……），以及发生错误时回调的error。为什么要将request封装为task呢？因为task将请求分为不同的阶段，可处理不同阶段的错误</p>
+<h3 id="调用resume开始执行之后，怎么处理回调的response呢"><a href="#调用resume开始执行之后，怎么处理回调的response呢" class="headerlink" title="调用resume开始执行之后，怎么处理回调的response呢"></a>调用resume开始执行之后，怎么处理回调的response呢</h3><ul>
+<li><p>通过hander block处理</p>
+<p>即在创建初期就将处理response的逻辑定义在completionHandler的block中</p>
+</li>
+<li><p>通过相应的delegate处理</p>
+<p>![image-20200630225808457](/Users/qaq/Library/Application Support/typora-user-images/image-20200630225808457.png)</p>
+</li>
+</ul>
+<h3 id="系统框架加载数据"><a href="#系统框架加载数据" class="headerlink" title="系统框架加载数据"></a>系统框架加载数据</h3><ul>
+<li><p>iOS默认要求的网络请求遵循https请求，如果是非https请求，需要修改info.plist中的设置</p>
+<p>![image-20200630230052250](/Users/qaq/Library/Application Support/typora-user-images/image-20200630230052250.png)</p>
+</li>
+</ul>
+<p>![image-20200630230357425](/Users/qaq/Library/Application Support/typora-user-images/image-20200630230357425.png)</p>
+<p>![屏幕快照 2020-06-30 23.08.52](/Users/qaq/Desktop/屏幕快照 2020-06-30 23.08.52.png)</p>
+<h1 id="AFNetworking"><a href="#AFNetworking" class="headerlink" title="AFNetworking"></a>AFNetworking</h1><blockquote>
+<p>简化使用NSURLSession的流程，目前许多开源框架都是基于AFNetWorking的二次封装</p>
+</blockquote>
+<p>使用cocopods集成框架</p>
+<h2 id="AFNetworking对session等的封装"><a href="#AFNetworking对session等的封装" class="headerlink" title="AFNetworking对session等的封装"></a>AFNetworking对session等的封装</h2><p>![image-20200701162900713](/Users/qaq/Library/Application Support/typora-user-images/image-20200701162900713.png)</p>
+<p>使用方法</p>
+<p>![image-20200701163221353](/Users/qaq/Library/Application Support/typora-user-images/image-20200701163221353.png)</p>
+<h1 id="JSON解析"><a href="#JSON解析" class="headerlink" title="JSON解析"></a>JSON解析</h1><blockquote>
+<p>轻量级、高可读性、纯文本形式的数据交换格式, </p>
+</blockquote>
+<h2 id="基本数据格式"><a href="#基本数据格式" class="headerlink" title="基本数据格式"></a>基本数据格式</h2><p>![image-20200701163742622](/Users/qaq/Library/Application Support/typora-user-images/image-20200701163742622.png)</p>
+<p>其他数据格式：protobuf </p>
+<h2 id="NSJSONSerialization"><a href="#NSJSONSerialization" class="headerlink" title="NSJSONSerialization"></a>NSJSONSerialization</h2><blockquote>
+<p>提供JSON数据和系统对象之间的转换，即将其中的dictionary转换为NSDictionary，array转换为NSArrary等</p>
+</blockquote>
+<h3 id="第一种方式"><a href="#第一种方式" class="headerlink" title="第一种方式"></a>第一种方式</h3><img src="/Users/qaq/Library/Application Support/typora-user-images/image-20200702185753698.png" alt="image-20200702185753698" style="zoom:80%;">
+
+<p>![image-20200702185807800](/Users/qaq/Library/Application Support/typora-user-images/image-20200702185807800.png)</p>
+<p>当NSObject转换为NSData时，形式是否有缩进或者单行输出</p>
+<h3 id="第二种方式"><a href="#第二种方式" class="headerlink" title="第二种方式"></a>第二种方式</h3><p>![image-20200702190012168](/Users/qaq/Library/Application Support/typora-user-images/image-20200702190012168.png)</p>
+<p>![image-20200702190022906](/Users/qaq/Library/Application Support/typora-user-images/image-20200702190022906.png)</p>
+<p>当解析NSData到可识别的NSObject时，options为是否是可变类型数据或者是外层数据格式，可设置为零</p>
+<p>系统提供的函数只能将<strong>JSON格式的</strong>二进制流转化为相应的dictionary、array、或者string。</p>
+<h2 id="结构化数据"><a href="#结构化数据" class="headerlink" title="结构化数据"></a>结构化数据</h2><p>使用系统函数解析二进制数据文件得到的字典数组（字典组成的数组）语义不明且使用不便，因此可以创建model类以创建实例对应每一个dictionary数组，那么dictionary中的每一个key都会暴露在model类的头文件中，那么我们就可以在model中操作每一个dictionary的属性。大致过程为：NSData–&gt;JSON–&gt;dictionaryArray–&gt;model</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>根据返回的json文件明确每一个dictionary中有哪些key。对应着这些key创建model中的属性，并定义函数方法来解析这些key中的数据。解析数据后，注意在model中做好容错性判断：返回的类型是否是自己定义的类型（类型转换错误）、是否有此key（属性和对象不一致错误 ）以及该key中是否有内容（即是否为null）</p>
+<h3 id="完整列表加载流程"><a href="#完整列表加载流程" class="headerlink" title="完整列表加载流程"></a>完整列表加载流程</h3><p>通过网络接口加载数据<br>使用NSJsonSerialization解析处理网络请求<br>数据model化<br>列表加载model数组</p>
+<blockquote>
+<p> <em>注意在取出数据将其存储在model的array时，需要做出相似的容错性判断</em></p>
+</blockquote>
+<h3 id="常用的开源项目"><a href="#常用的开源项目" class="headerlink" title="常用的开源项目"></a>常用的开源项目</h3><p>YYModel、Mantle、MJExtension等，大致原理都是封装了NSData–JSON–Model的流程，只需一个函数方法就可以实现json到mode或者model到json的转换</p>
+<p>使用block</p>
 <a id="more"></a>
 
 
@@ -525,7 +606,7 @@
               
                 <a href="/archives/%20%7C%7C%20archive">
               
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">33</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -533,6 +614,15 @@
 
             
 
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
             
 
           </nav>
@@ -562,7 +652,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Web基础知识"><span class="nav-number">1.</span> <span class="nav-text">Web基础知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIWebView和WKWebView的区别"><span class="nav-number">2.</span> <span class="nav-text">UIWebView和WKWebView的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用WKWebView"><span class="nav-number">3.</span> <span class="nav-text">使用WKWebView</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本的加载"><span class="nav-number">3.1.</span> <span class="nav-text">基本的加载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WKNavigationDelegate"><span class="nav-number">3.2.</span> <span class="nav-text">WKNavigationDelegate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WKUIDelegate"><span class="nav-number">3.3.</span> <span class="nav-text">WKUIDelegate</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WKWebView简单实例"><span class="nav-number">4.</span> <span class="nav-text">WKWebView简单实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现步骤"><span class="nav-number">4.1.</span> <span class="nav-text">实现步骤</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Web基础知识"><span class="nav-number">1.</span> <span class="nav-text">Web基础知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIWebView和WKWebView的区别"><span class="nav-number">2.</span> <span class="nav-text">UIWebView和WKWebView的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用WKWebView"><span class="nav-number">3.</span> <span class="nav-text">使用WKWebView</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本的加载"><span class="nav-number">3.1.</span> <span class="nav-text">基本的加载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WKNavigationDelegate"><span class="nav-number">3.2.</span> <span class="nav-text">WKNavigationDelegate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WKUIDelegate"><span class="nav-number">3.3.</span> <span class="nav-text">WKUIDelegate</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WKWebView简单实例"><span class="nav-number">4.</span> <span class="nav-text">WKWebView简单实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现步骤"><span class="nav-number">4.1.</span> <span class="nav-text">实现步骤</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#APP内基本网络流程"><span class="nav-number"></span> <span class="nav-text">APP内基本网络流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#NSURL（Uniform-Resource-Locator，资源定位）"><span class="nav-number">1.</span> <span class="nav-text">NSURL（Uniform Resource Locator，资源定位）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSURLRequest"><span class="nav-number">2.</span> <span class="nav-text">NSURLRequest</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#控制台debug"><span class="nav-number">3.</span> <span class="nav-text">控制台debug</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NSURLSession"><span class="nav-number"></span> <span class="nav-text">NSURLSession</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#NSURLSession的组织结构"><span class="nav-number">1.</span> <span class="nav-text">NSURLSession的组织结构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NSURLSessionTask"><span class="nav-number"></span> <span class="nav-text">NSURLSessionTask</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调用resume开始执行之后，怎么处理回调的response呢"><span class="nav-number">0.1.</span> <span class="nav-text">调用resume开始执行之后，怎么处理回调的response呢</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统框架加载数据"><span class="nav-number">0.2.</span> <span class="nav-text">系统框架加载数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AFNetworking"><span class="nav-number"></span> <span class="nav-text">AFNetworking</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AFNetworking对session等的封装"><span class="nav-number">1.</span> <span class="nav-text">AFNetworking对session等的封装</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JSON解析"><span class="nav-number"></span> <span class="nav-text">JSON解析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本数据格式"><span class="nav-number">1.</span> <span class="nav-text">基本数据格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSJSONSerialization"><span class="nav-number">2.</span> <span class="nav-text">NSJSONSerialization</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一种方式"><span class="nav-number">2.1.</span> <span class="nav-text">第一种方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二种方式"><span class="nav-number">2.2.</span> <span class="nav-text">第二种方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结构化数据"><span class="nav-number">3.</span> <span class="nav-text">结构化数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现"><span class="nav-number">3.1.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#完整列表加载流程"><span class="nav-number">3.2.</span> <span class="nav-text">完整列表加载流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用的开源项目"><span class="nav-number">3.3.</span> <span class="nav-text">常用的开源项目</span></a></li></ol></li></ol></div>
             
 
           </div>
