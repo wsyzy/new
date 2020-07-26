@@ -280,7 +280,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/01/%E5%B8%B8%E7%94%A8%E6%A1%86%E6%9E%B6%E9%9B%86%E6%88%90%E6%96%B9%E5%BC%8F/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/06/iOS%E4%B8%AD%E7%9A%84%E5%A4%9A%E7%BA%BF%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wendyzy">
@@ -299,7 +299,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/07/01/%E5%B8%B8%E7%94%A8%E6%A1%86%E6%9E%B6%E9%9B%86%E6%88%90%E6%96%B9%E5%BC%8F/" itemprop="url">常用框架集成方式</a></h1>
+                <a class="post-title-link" href="/2020/07/06/iOS%E4%B8%AD%E7%9A%84%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="url">iOS中的多线程</a></h1>
         
 
         <div class="post-meta">
@@ -311,8 +311,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-01T16:20:09+08:00">
-                2020-07-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-06T09:55:14+08:00">
+                2020-07-06
               </time>
             
 
@@ -370,11 +370,218 @@
       
         
           
-            <h1 id="常用框架集成方式"><a href="#常用框架集成方式" class="headerlink" title="常用框架集成方式"></a>常用框架集成方式</h1><blockquote>
-<p>多个project合成一个workspace进行调用，可以使用subModule或者Cocoapods或者Carthage来进行代码管理</p>
+            <h1 id="学习笔记–iOS中的多线程"><a href="#学习笔记–iOS中的多线程" class="headerlink" title="学习笔记–iOS中的多线程"></a>学习笔记–iOS中的多线程</h1><p><a href="https://developer.apple.com/videos/play/wwdc2015/718/" target="_blank" rel="noopener">Apple视频</a></p>
+<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h4 id="iOS中的进程和线程"><a href="#iOS中的进程和线程" class="headerlink" title="iOS中的进程和线程"></a>iOS中的进程和线程</h4><ol>
+<li>进程</li>
+</ol>
+<ul>
+<li>通常来说一个 App 就是⼀个进程，每个进程之间是独立的，运行在其专用的且受保护的内存空间内。iOS 开发中较少的运用进程间的通信(XPC)，绝⼤部分都使用线程。</li>
+<li>通过“活动监视器”可以查看Mac系统中开启的进程</li>
+</ul>
+<ol start="2">
+<li>线程</li>
+</ol>
+<ul>
+<li>一个进程有多个线程组成，线程是进程的基本执行单元，一个进程中的所有任务都在线程中执行</li>
+</ul>
+<h4 id="iOS中的主线程和非主线程"><a href="#iOS中的主线程和非主线程" class="headerlink" title="iOS中的主线程和非主线程"></a>iOS中的主线程和非主线程</h4><ul>
+<li><p>一个程序运行后默认会开启一个线程，成为“主线程”或“UI线程”，一般用来刷新UI界面，处理UI事件（手势操作等）。几乎所有UIKit提供的类和包含Mutable的类都是线程不安全的，为保证流畅体验及线程安全，所有 UI 操作都集中到一个线程</p>
+<p><em>主线程一般都用于展示UI，从网络中获取图片为高耗时的操作，若将其置于主线程，该部分长时间的等待会导致整个界面的UI的加载以及滚动的操作十分缓慢，导致卡顿和失真的现象。因此一般将其置于自定义线程中</em></p>
+</li>
+<li><p>影响 UI 体验(较⻓时间的操作)尽量放到非主线程</p>
+</li>
+<li><p>同步 &amp; 异步</p>
+<p>线程同步：多条线程按顺序执行任务</p>
+</li>
+</ul>
+<h4 id="多线程优点"><a href="#多线程优点" class="headerlink" title="多线程优点"></a>多线程优点</h4><p>解决程序阻塞问题，提供程序的执行效率</p>
+<h5 id="多线程执行原理"><a href="#多线程执行原理" class="headerlink" title="多线程执行原理"></a>多线程执行原理</h5><p>单核CPU同一时间，只能处理一个线程，只有一个线程在执行。多线程的同时执行是CPU快速的在多个线程之间的切换。CPU跳读线程的时间足够快就造成了多线程的“同时”执行。</p>
+<h2 id="线程的状态"><a href="#线程的状态" class="headerlink" title="线程的状态"></a>线程的状态</h2><p>![image-20200726102547559](/Users/qaq/Library/Application Support/typora-user-images/image-20200726102547559.png)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start &#x2F;&#x2F;就绪状态</span><br><span class="line">sleep &#x2F;&#x2F;阻塞</span><br><span class="line">exit  &#x2F;&#x2F;退出，“非自然”死亡状态</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="线程的属性"><a href="#线程的属性" class="headerlink" title="线程的属性"></a>线程的属性</h2><p>线程执行完之后会自动销毁，当线程死亡之后，不能再次使用</p>
+<p>使用<code>name</code>方法给线程取名有利于错误的排查</p>
+<p>线程的执行都不是受程序员控制的，系统会自动给我们创建辅助线程，线程间切换执行</p>
+<h2 id="线程的优先级"><a href="#线程的优先级" class="headerlink" title="线程的优先级"></a>线程的优先级</h2><p>调用方法 <code>threadPriority</code></p>
+<p>线程优先级的取值范围为0.0-1.0，默认为0.5</p>
+<p>线程的优先级只能保证程序开始执行时分配资源的概率变大或变小，而不能执行绝对的优先顺序</p>
+<h2 id="多线程访问共享资源的问题"><a href="#多线程访问共享资源的问题" class="headerlink" title="多线程访问共享资源的问题"></a>多线程访问共享资源的问题</h2><ol>
+<li><p>共享资源</p>
+<p>一块资源可能会被多个线程共享，也就是多个线程可能会访问同一块资源，比如说同一个对象，同一个变量，同一个文件等。而当这种情况发生后，很容易引发数据错路和数据安全的问题。</p>
+</li>
+<li><p>模拟多窗口卖票（设总数10张）</p>
+<p><strong>问题</strong>：两窗口可能出现都卖了一张票但是剩余票数都为9的情况，也可能会出现一个窗口先打印剩8张票，另一个窗口后打印剩9张票的情况。即在一个线程执行其数据读取操作的时候另一个线程操作的插入会导致数据的不连续或者整体的偏差</p>
+<p><strong>结论</strong>：线程是不安全的，其执行结果很有可能不符合我们的预期</p>
+<p><strong>解决问题</strong>：给线程的读取加上安全锁，保证其在读写数据的时候没有其他线程的插入</p>
+</li>
+</ol>
+<h2 id="线程安全锁（互斥锁）"><a href="#线程安全锁（互斥锁）" class="headerlink" title="线程安全锁（互斥锁）"></a>线程安全锁（互斥锁）</h2><blockquote>
+<p> 多线程共享资源时</p>
 </blockquote>
-<h2 id="三种代码管理的区别"><a href="#三种代码管理的区别" class="headerlink" title="三种代码管理的区别"></a>三种代码管理的区别</h2><p>![image-20200701160946851](/Users/qaq/Library/Application Support/typora-user-images/image-20200701160946851.png)</p>
-<h2 id="使用cocopods集成pods"><a href="#使用cocopods集成pods" class="headerlink" title="使用cocopods集成pods"></a>使用cocopods集成pods</h2><p>项目中新建文件夹–打开pods文件输入想要集成的库–结合结合Pods.xcodeproj文件生成workspace</p>
+<p>​        </p>
+<p>​        任意一个对象内部都有一把互斥锁（变量，默认打开），为了实现线程同步以防止因多线程抢夺资源造成的数据安全问题，但是加锁会影响程序的性能。</p>
+<p>​        加锁：<code>@synchronized (token) {}</code>，其中token为锁对象，执行时会判断其是打开（为1）还是关闭状态（为0）。如果是线程执行到代码块内部会先上锁。如果锁被关闭，再有线程要执行代码块就会先等待直到锁打开才进入。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;ViewController.h&quot;</span><br><span class="line"></span><br><span class="line">@interface ViewController ()</span><br><span class="line"></span><br><span class="line">@property(assign,nonatomic)int ticketCount;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation ViewController</span><br><span class="line"></span><br><span class="line">- (void)viewDidLoad &#123;</span><br><span class="line">    [super viewDidLoad];</span><br><span class="line"> </span><br><span class="line">    self.ticketCount &#x3D; 10;</span><br><span class="line">    NSThread *thread1 &#x3D; [[NSThread alloc]initWithTarget:self selector:@selector(sellTickets:) object:@&quot;线程1&quot;];</span><br><span class="line">    [thread1 start];</span><br><span class="line">    </span><br><span class="line">    NSThread *thread2 &#x3D; [[NSThread alloc]initWithTarget:self selector:@selector(sellTickets:) object:@&quot;线程2&quot;];</span><br><span class="line">    [thread2 start];</span><br><span class="line">&#125;</span><br><span class="line">-(void)sellTickets:(NSString *)name&#123;</span><br><span class="line">&#x2F;&#x2F;    NSLog(@&quot;execute thread: %@&quot;,name);</span><br><span class="line">    while (YES) &#123;</span><br><span class="line">        [NSThread sleepForTimeInterval:5];</span><br><span class="line">        &#x2F;&#x2F;同步</span><br><span class="line">        @synchronized (self) &#123;</span><br><span class="line">            if (self.ticketCount &gt; 0) &#123;</span><br><span class="line">                self.ticketCount--;</span><br><span class="line">                NSLog(@&quot;剩余 %d 张票&quot;,self.ticketCount);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                NSLog(@&quot;来晚了，票卖完了&quot;);</span><br><span class="line">                break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+
+
+<p>![image-20200726112333312](/Users/qaq/Library/Application Support/typora-user-images/image-20200726112333312.png)</p>
+<h4 id="原子属性"><a href="#原子属性" class="headerlink" title="原子属性"></a>原子属性</h4><p>模拟name的atomic属性（自旋锁）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@property(nonatomic,copy)NSString *name;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;为属性生成对应的成员变量，因为当同时重写属性的setter和getter方法时不会自动生成_name成员变量</span><br><span class="line">@synthesize name &#x3D; _name;</span><br><span class="line"></span><br><span class="line">-(NSString *)name&#123;</span><br><span class="line">    return _name;</span><br><span class="line">&#125;</span><br><span class="line">-(void)setName:(NSString *)name&#123;</span><br><span class="line">  &#x2F;&#x2F;加锁</span><br><span class="line">    @synchronized (self) &#123;</span><br><span class="line">        _name &#x3D; name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>![image-20200726113517052](/Users/qaq/Library/Application Support/typora-user-images/image-20200726113517052.png)</p>
+<h2 id="互斥锁和自旋锁的区别"><a href="#互斥锁和自旋锁的区别" class="headerlink" title="互斥锁和自旋锁的区别"></a>互斥锁和自旋锁的区别</h2><p>![image-20200726113813617](/Users/qaq/Library/Application Support/typora-user-images/image-20200726113813617.png)</p>
+<h4 id="iOS中的多线程相关的技术方案与知识点"><a href="#iOS中的多线程相关的技术方案与知识点" class="headerlink" title="iOS中的多线程相关的技术方案与知识点"></a>iOS中的多线程相关的技术方案与知识点</h4><p>NSThread / GCD / NSOperation / Runloop …</p>
+<p>![image-20200725195621482](/Users/qaq/Library/Application Support/typora-user-images/image-20200725195621482.png)</p>
+<h2 id="pthread"><a href="#pthread" class="headerlink" title="pthread"></a>pthread</h2><ul>
+<li>类名后缀为<code>_t</code>一般为C语言中的函数，把OC的对象传递给C语言的函数要使用<code>__bridge</code>桥接，这与OC中MRC和ARC的内存机制有关。</li>
+<li>nil 代表空对象，NULL代表空地址</li>
+<li>C语言中定义字符串的方法：char *p = “linux”;此时p就叫字符串，但是实际上p只是一个字符指针。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">- (void)viewDidLoad &#123;</span><br><span class="line">    [super viewDidLoad];</span><br><span class="line">  </span><br><span class="line">    pthread_t pthread ; &#x2F;&#x2F;创建子线程</span><br><span class="line">    NSString *name &#x3D; @&quot;这是一个线程&quot;;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F;第一个参数 ：线程编号的地址(&amp;取地址，*取内容)</span><br><span class="line">    &#x2F;&#x2F;第二个参数：线程编号的地址</span><br><span class="line">    &#x2F;&#x2F;第三个参数：线程要执行的函数 void * (*) (void *)</span><br><span class="line">    &#x2F;&#x2F;int * 指向int类型的指针  void*指向任何类型的指针，类似于OC中的id</span><br><span class="line">    int result &#x3D; pthread_create(&amp;pthread, NULL, demo((__bridge void *)(name)), NULL);</span><br><span class="line">  	</span><br><span class="line">  	NSLog(@&quot;The current thread in viewDidLoad: %@&quot;,[NSThread currentThread]);</span><br><span class="line">  </span><br><span class="line">    &#x2F;&#x2F; pthread_create 函数的返回值 int 0为成功，反之失败</span><br><span class="line">    if(result &#x3D;&#x3D; 0)&#123;</span><br><span class="line">        NSLog(@&quot;create pthread successfully!&quot;);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        NSLog(@&quot;failed to create pthread&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">void *demo(void *param)&#123;</span><br><span class="line">    NSString *name &#x3D; (__bridge NSString *)(param);&#x2F;&#x2F;这里将C语言中的字符串进行桥接转换为OC中的字符串类型</span><br><span class="line">    NSLog(@&quot;hello %@ %@&quot;,name,[NSThread currentThread]);</span><br><span class="line">    return NULL;    &#x2F;&#x2F;函数的返回类型为指针类型</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<p>![image-20200725211642871](/Users/qaq/Library/Application Support/typora-user-images/image-20200725211642871.png)</p>
+<p>线程的number为1表示主线程，其他的number表示非主线程。先执行，先创建线程再执行线程里的函数。</p>
+<h2 id="NSThread"><a href="#NSThread" class="headerlink" title="NSThread"></a>NSThread</h2><ul>
+<li><p>pthread 的封装</p>
+<p>number为1的线程为主线程，其他的都为子线程。</p>
+</li>
+<li><p>创建新的线程</p>
+<p>方式一</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">NSThread *thread &#x3D; [[NSThread alloc] initWithTarget:self selector:@selector(demo) object:nil];	&#x2F;&#x2F;object表示给demo方法传递参数，此处demo方法不含参数，故设为nil</span><br><span class="line">    [thread start];</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;demo方法</span><br><span class="line"> -(void)demo&#123;</span><br><span class="line">    NSLog(@&quot;execute thread&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方式二</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[NSThread detachNewThreadSelector:@selector(demo) toTarget:self withObject:nil];</span><br></pre></td></tr></table></figure>
+
+<p>方式三</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[self performSelectorInBackground:@selector(demo) withObject:nil]; &#x2F;&#x2F;在后台执行</span><br></pre></td></tr></table></figure>
+
+<p>方式四（方式一带参数的样式）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> NSThread *thread &#x3D; [[NSThread alloc]initWithTarget:self selector:@selector(demo:) object:@&quot;线程&quot;];</span><br><span class="line">    [thread start];</span><br><span class="line">&#x2F;&#x2F;demo函数</span><br><span class="line">    -(void)demo:(NSString *)name&#123;</span><br><span class="line">    NSLog(@&quot;execute thread: %@&quot;,name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li><p>执⾏之后⾃自动销毁</p>
+</li>
+<li><p>每次都要创建</p>
+</li>
+<li><p>手动进行线程同步</p>
+</li>
+<li><p>手动管理线程的生命周期</p>
+</li>
+</ul>
+<p>​      </p>
+<p>​          使用断点调试，左侧导航栏可以看到线程的运行情况，其中自定义线程名可见，在LLDB中使用NSTread类方法进行调试，可得出相应结果</p>
+<h3 id="异步下载网络图片"><a href="#异步下载网络图片" class="headerlink" title="异步下载网络图片"></a>异步下载网络图片</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;ViewController.h&quot;</span><br><span class="line">#import &lt;pthread&#x2F;pthread.h&gt;</span><br><span class="line"></span><br><span class="line">@interface ViewController ()</span><br><span class="line"></span><br><span class="line">@property(nonatomic,strong)UIScrollView *scrollView;</span><br><span class="line">@property(nonatomic,strong)UIImageView *imageView;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation ViewController</span><br><span class="line"></span><br><span class="line">- (void)viewDidLoad &#123;</span><br><span class="line">    [super viewDidLoad];</span><br><span class="line">    &#x2F;&#x2F; Do any additional setup after loading the view.</span><br><span class="line">    [self.view addSubview:(&#123;</span><br><span class="line">        _scrollView &#x3D; [[UIScrollView alloc]initWithFrame:[[UIScreen mainScreen]bounds]];</span><br><span class="line">        _scrollView;</span><br><span class="line">    &#125;)];</span><br><span class="line">    [_scrollView addSubview:(&#123;</span><br><span class="line">        _imageView &#x3D; [[UIImageView alloc]initWithFrame:self.view.frame];</span><br><span class="line">        _imageView;</span><br><span class="line">    &#125;)];</span><br><span class="line">    </span><br><span class="line">    NSThread *thread &#x3D; [[NSThread alloc]initWithTarget:self selector:@selector(downloadImage) object:nil];</span><br><span class="line">    [thread start];</span><br><span class="line">&#125;</span><br><span class="line">-(void)downloadImage&#123;</span><br><span class="line">    NSURL *url &#x3D; [NSURL URLWithString:@&quot;https:&#x2F;&#x2F;dss1.baidu.com&#x2F;6ONXsjip0QIZ8tyhnq&#x2F;it&#x2F;u&#x3D;2488667653,1366191503&amp;fm&#x3D;85&amp;app&#x3D;92&amp;f&#x3D;PNG?w&#x3D;121&amp;h&#x3D;75&amp;s&#x3D;33E363A6664338E60B944993030010D2&quot;]; </span><br><span class="line">    &#x2F;&#x2F;download image from net</span><br><span class="line">    NSData *data &#x3D; [NSData dataWithContentsOfURL:url];</span><br><span class="line">    UIImage *img &#x3D; [UIImage imageWithData:data];</span><br><span class="line">    &#x2F;&#x2F;img is the parameter of function updateUI: here</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F;return to main thread.The communication between threads and mainthread where UI are updated.Code behind will be executed after the implemention of function &#39;updateUI:&#39; if parameter &#39;waitUntilDone&#39; is YES</span><br><span class="line">    [self performSelectorOnMainThread:@selector(updateUI:) withObject:img waitUntilDone:YES];</span><br><span class="line">&#125;</span><br><span class="line">-(void)updateUI:(UIImage *)image&#123;</span><br><span class="line">    _imageView.image &#x3D; image;</span><br><span class="line">    &#x2F;&#x2F;make imageView.size &#x3D; image.size</span><br><span class="line">    [_imageView sizeToFit];</span><br><span class="line">    &#x2F;&#x2F;stipulate scrollView&#39;s range of rolling</span><br><span class="line">    _scrollView.contentSize &#x3D; image.size;</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>info.plist 配置</p>
+<p>![image-20200726144223061](/Users/qaq/Library/Application Support/typora-user-images/image-20200726144223061.png)</p>
+<h2 id="消息循环"><a href="#消息循环" class="headerlink" title="消息循环"></a>消息循环</h2><ul>
+<li><p>什么是消息循环：</p>
+<p>消息循环就是NSRunloop这个类 ，每个线程都有自己的消息循环。整个事件的驱动基于消息循环。</p>
+<p>主线程的消息循环默认是开启的（需要去检测事件），子线程默认关闭（通常不需要子线程检测事件）。</p>
+</li>
+<li><p>消息循环的目的：</p>
+<p>类似于死循环，<strong>保证程序不退出</strong>（与执行完main函数便退出的程序相对应）、<strong>负责处理输入事件</strong>（输入源和Timer源）、<strong>如果没有事件发生则会让程序处于休眠状态</strong>。</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">\\模拟消息循环</span><br><span class="line">int main(int argc,const char * argv[])&#123;</span><br><span class="line">	while(YES)&#123;</span><br><span class="line">		printf(&quot;请输入操作：&quot;);</span><br><span class="line">		int number;</span><br><span class="line">		scanf(&quot;%d&quot;,&amp;number);</span><br><span class="line">		if(number &#x3D;&#x3D; 0)&#123;</span><br><span class="line">				break;</span><br><span class="line">			&#125;else&#123;</span><br><span class="line">				handler(number);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">void handler(int number)&#123;</span><br><span class="line">		if(number &#x3D;&#x3D; 1)&#123;</span><br><span class="line">			printf(&quot;tap screen&quot;);</span><br><span class="line">		&#125;else if(number &#x3D;&#x3D; 2)&#123;</span><br><span class="line">			printf(&quot;scroll it!&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>消息循环之输入事件</p>
+<p>即Runloop接收输入事件来自两种不同的来源，即输入源和定时源。</p>
+<ol>
+<li><p>输入源</p>
+<p>包括系统接收的鼠标和键盘事件，NSPort 对象和NSConnection对象。</p>
+</li>
+<li><p>定时源</p>
+<p>定时器执行的方法中不易执行太耗时的操作，否则会降低用户体验，用户拖拽时会感到卡顿现象。</p>
+</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li><p>消息循环的两种运行模式：</p>
+<ul>
+<li><p>NSDefaultRunloopModel</p>
+<p>处理除了NSConnection对象以外的输入源</p>
+</li>
+<li><p>NSRunloopCommonModels</p>
+<p>当对象添加进使用此值作为mode的循环时，该对象将被所有声明为common的mode监视</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>​    消息循环需要在一定的模式下才能相匹配，当在消息循环中添加了一个定时源时， 消息循环的模式必须和定时源的模式相匹配才能执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;在主线程中：</span><br><span class="line">NSTimer *timer&#x3D;  [NSTimer timerWithTimeInterval:1.0 target:self selector:@selector(TextDemo) userInfo:nil repeats:YES];</span><br><span class="line">      [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];</span><br><span class="line"></span><br><span class="line">     &#x2F;*当当前模式为NSDefaultRunLoopMode时，当在UI上触发可见事件时，模式就发生了改变,定时源中的方法不运行了.将模式改为NSRunloopCommonModels时，定时源中的方法正常执行， 因为该模式下包含了两个底层的模式。 *&#x2F;</span><br><span class="line"></span><br><span class="line"> &#x2F;&#x2F;  在子线程中需要开启消息循环的方法：</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;直接开启消息循环</span><br><span class="line">    [[NSRunLoop currentRunLoop] run];</span><br><span class="line">  &#x2F;&#x2F;开启到什么时间</span><br><span class="line">    [[NSRunLoop currentRunLoop]runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2.0]];</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>子线程的消息循环</li>
+</ul>
+<h1 id="GCD（Grand-Central-Dispatch）"><a href="#GCD（Grand-Central-Dispatch）" class="headerlink" title="GCD（Grand Central Dispatch）"></a>GCD（Grand Central Dispatch）</h1><blockquote>
+<p>函数方法通常以dispatch开头。</p>
+</blockquote>
+<ul>
+<li>高性能的多线程解决方案，⾃动利用 CPU </li>
+<li>线程池模式，⾃动分配/调度线程，管理线程的生命周期</li>
+<li>通过队列管理多任务, FIFO</li>
+<li>对开发者使用队列代替线程的创建 ( 加入到合适的线程 ——&gt; 加⼊入到合适的队列 )</li>
+</ul>
+<h2 id="GCD中的队列"><a href="#GCD中的队列" class="headerlink" title="GCD中的队列"></a>GCD中的队列</h2><ul>
+<li><p>主线程对应主队列</p>
+</li>
+<li><p>非主线程按照优先级分为4个队列（非主线程与主线程为平行关系）</p>
+<p>high/default/low/background</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#define DISPATCH_QUEUE_PRIORITY_HIGH 2</span><br><span class="line">#define DISPATCH_QUEUE_PRIORITY_DEFAULT 0</span><br><span class="line">#define DISPATCH_QUEUE_PRIORITY_LOW (-2)</span><br><span class="line">#define DISPATCH_QUEUE_PRIORITY_BACKGROUND INT16_MIN</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>自定义队列：系统自动分配优先级</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;主线程</span><br><span class="line">dispatch_queue_main_t</span><br><span class="line">dispatch_get_main_queue(void)</span><br><span class="line"> &#x2F;&#x2F;非主线程，第一个参数即为优先级第二个默认0</span><br><span class="line">dispatch_queue_global_t</span><br><span class="line">dispatch_get_global_queue(long identifier, unsigned long flags);</span><br><span class="line">dispatch_queue_t</span><br><span class="line">  &#x2F;&#x2F;创建队列，第一个参数为队列名，第二个参数为定义该队列为串行（serial）还是并行（concurrent）</span><br><span class="line">dispatch_queue_create(const char *_Nullable label,</span><br><span class="line">		dispatch_queue_attr_t _Nullable attr);</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="GCD的使用"><a href="#GCD的使用" class="headerlink" title="GCD的使用"></a>GCD的使用</h2><ul>
+<li>使用 GCD 处理多线程业务逻辑</li>
+<li>选择合适的队列，添加业务逻辑 Block</li>
+<li>在队列中同步 / 异步 / 延迟执行业务逻辑</li>
+<li>注意block的循环引⽤</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;异步</span><br><span class="line">void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);</span><br><span class="line">&#x2F;&#x2F;同步</span><br><span class="line">void</span><br><span class="line">dispatch_sync(dispatch_queue_t queue, DISPATCH_NOESCAPE dispatch_block_t block);</span><br><span class="line">&#x2F;&#x2F;延时 </span><br><span class="line">void</span><br><span class="line">dispatch_after(dispatch_time_t when, dispatch_queue_t queue,</span><br><span class="line">		dispatch_block_t block);</span><br></pre></td></tr></table></figure>
+
+<h2 id="GCD中其他常用函数"><a href="#GCD中其他常用函数" class="headerlink" title="GCD中其他常用函数"></a>GCD中其他常用函数</h2><p>![image-20200706140758708](/Users/qaq/Library/Application Support/typora-user-images/image-20200706140758708.png)</p>
+<h1 id="NSOperation"><a href="#NSOperation" class="headerlink" title="NSOperation"></a>NSOperation</h1><blockquote>
+<p>GCD 缺少可定制性和复杂的依赖，NSOperation是相比于GCD更加面向对象的封装，是在Grand Central Dispatch之上构建的API,其中：</p>
+<ul>
+<li>NSOperationQueue相当于GCD中的队列</li>
+<li>NSOperation相当于GCD的block中的任务</li>
+</ul>
+</blockquote>
+<ul>
+<li>提供任务之间的依赖关系</li>
+<li>支持取消暂停任务，优先级的设置</li>
+<li>子类继承实现，符合业务逻辑的定制</li>
+<li>队列支持最大并发数设置等</li>
+</ul>
+<h1 id="Runloop"><a href="#Runloop" class="headerlink" title="Runloop"></a>Runloop</h1><ul>
+<li>Runloop 伴随线程的任务处理循环 </li>
+<li>Runloop 和线程⼀一对应</li>
+<li>Mode &amp; 状态监听</li>
+<li>Runloop 的应⽤（延时操作）：NSTimer + performselector</li>
+</ul>
+<p>![image-20200706142133742](/Users/qaq/Library/Application Support/typora-user-images/image-20200706142133742.png)</p>
+<p>​            <em>从左到右为最低层到最上层的封装</em></p>
+<p>Thread分主线程以及非主线程，封装为NSThread，每一个线程都配有一个runloop来一直循环查询该线程中是否有相应的业务逻辑的操作。为了线程间更好的切换，GCD和NSOperation的封装将对thread的操作转换为对queue的操作，管理线程池中的切换，此时的业务逻辑加入Queue中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;取一个系统提供的非主队列</span><br><span class="line">    dispatch_queue_global_t downloadQueue &#x3D; dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);</span><br><span class="line">    &#x2F;&#x2F;获取主队列</span><br><span class="line">    dispatch_queue_main_t mainQueue &#x3D; dispatch_get_main_queue();</span><br><span class="line">    </span><br><span class="line">    dispatch_async(downloadQueue, ^&#123;</span><br><span class="line">        &#x2F;&#x2F; 在非主线程中加载image--高耗时操作</span><br><span class="line">        UIImage *image &#x3D; [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:item.picUrl]]];</span><br><span class="line">        &#x2F;&#x2F;在主线程中将加载得来的image渲染到UI中</span><br><span class="line">        dispatch_async(mainQueue, ^&#123;</span><br><span class="line">             self.rightImageView.image &#x3D; image;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>下图为简要逻辑</p>
+<p>![image-20200706142925354](/Users/qaq/Library/Application Support/typora-user-images/image-20200706142925354.png)</p>
 
           
         
@@ -522,297 +729,6 @@
 </blockquote>
 <p>横向实现：一个scrollView包含多个切换新闻页面话题进行横向滚动的处理，底部用一个tabarView包含四个tab，每个tab承载一个controller</p>
 <p>纵向：tableView的排列，单击新闻界面每一个cell进入WKWebVIew，WKWebView其中的推荐新闻，用户评论等可以使用tableview来实现</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <div>
-    
-    </div>
-    
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/28/PS%E5%AD%A6%E4%B9%A02_%E5%9B%BE%E5%83%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Wendyzy">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wendyzy的blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/06/28/PS%E5%AD%A6%E4%B9%A02_%E5%9B%BE%E5%83%8F/" itemprop="url">PS学习2_图像</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-28T21:22:21+08:00">
-                2020-06-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  
-                </span>
-              
-
-              
-
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="文档基本设置"><a href="#文档基本设置" class="headerlink" title="文档基本设置"></a>文档基本设置</h1><ul>
-<li><p>psd文档：Photoshop源文件，保存文档的图像、图层、通道等，可以利用PS再编辑</p>
-</li>
-<li><p>像素：图像元素，色彩小方格，构成数码影像的基本单位，</p>
-</li>
-<li><p>分辨率：单位长度中所表达的像素数目，通常以 像素/英寸(pixels per inch，即ppi) 为单位来表示影像分辨率的大小，例如：pixel per inch 每英寸72像素 = 72 ppi</p>
-<p>ppi：数字影像作品使用</p>
-<p>dpi ：dots per inch，即输出的分辨率设置图像输出使用，设置的分辨率</p>
-<blockquote>
-<p>分辨率越高，对系统的要求越高，占用的内存就会越大，运行的速度也会变慢。<br>一般网页浏览的图片分辨率设置为72ppi，印刷作品的ppi不低于300ppi</p>
-</blockquote>
-</li>
-<li><p>色彩模式：通常包括两种模式</p>
-<p>rgb颜色模式：即red，green，blue。针对电子元件，有1670万种颜色</p>
-<pre><code>cmyk颜色模式：c为青色，m为洋红色，y为黄色，k为黑色。常用在印刷作品，减少失                                真，但在运行时比较慢</code></pre><blockquote>
-<p>即使在CMYK模式下工作，PS也必须将CMYK模式转为显示器所使用的RGB模式，对于同样的图像，CMYK需要处理四个通道</p>
-</blockquote>
-<p>​    <em>CMYK与RGB模式的转换：用RGB模式来编辑图像，打印前转换为CMYK模式，进行矫正等再输出</em></p>
-</li>
-<li><p>背景内容的设置</p>
-<p>​    ![image-20200628185513194](/Users/qaq/Library/Application Support/typora-user-images/image-20200628185513194.png)</p>
-<p>​    常用白色或者黑色，如果需要制作背景色透明的gif小动画则需要将其背景色设置为透明色，最后保存的.gif或者.png格式的时候便是透明的</p>
-</li>
-<li><p>自定义文档</p>
-<p>在<strong>照片</strong>类别：</p>
-<p>需要6寸的照片：选择横向4*6英寸 300ppi的文档，或者纵向的 4 * 6英寸 300ppi的文档</p>
-<p>需要7寸的照片：选择横向或者纵向的 5 * 7英寸的300ppi文档</p>
-<p>在<strong>打印</strong>类别：</p>
-<p>A4：210*297 mm的300ppi的文档</p>
-<p>在<strong>图稿和插图</strong>类别：</p>
-<p>像素网格，海报，默认都为300ppi</p>
-<p>Web、移动设备、胶卷</p>
-<h1 id="工作区的设置"><a href="#工作区的设置" class="headerlink" title="工作区的设置"></a>工作区的设置</h1></li>
-</ul>
-<p>  ![image-20200628190734806](/Users/qaq/Library/Application Support/typora-user-images/image-20200628190734806.png)</p>
-<p>![image-20200628190822936](/Users/qaq/Library/Application Support/typora-user-images/image-20200628190822936.png)</p>
-<p>窗口-&gt;排列 ： 可以对已在工作区打开的文件进行排列，方便多文档间的对比应用。比如双联垂直排列可以用于原图和效果图的对比、文档之间图像的复制；平铺排列方式可以自动调整窗口的大小，实现各个窗口；浮动文档窗口，可以让文档窗口自由浮动<br>导航区面板<br>恢复默认面板设置</p>
-<h1 id="图像合成流程-水果家族"><a href="#图像合成流程-水果家族" class="headerlink" title="图像合成流程(水果家族)"></a>图像合成流程(水果家族)</h1><h2 id="选择素材"><a href="#选择素材" class="headerlink" title="选择素材"></a>选择素材</h2><p>.psd    可以直接双击，默认用PS打开<br>.jpg    需要选择打开方式</p>
-<h2 id="多素材放置在同一个文件中"><a href="#多素材放置在同一个文件中" class="headerlink" title="多素材放置在同一个文件中"></a>多素材放置在同一个文件中</h2><ul>
-<li><p>跨标题栏直接拖动法</p>
-<p>选择并移动工具–V</p>
-</li>
-<li><p>窗口排列拖动法</p>
-</li>
-<li><p>置入法</p>
-<p>置入嵌入对象：在临时文件中修改保存到引用文件中，原文件可以删除且不会发生改变，删除原文件之后不会显示找不到</p>
-<p>置入链接的智能对象：置入的图片修改操作是直接在被链接的原文件上修改，需要保存原文件，只是链接借用到另一个文档中，被链接的文件不能删除。若在PS中修改了图层，原文件也会发生变化，且删除原文件会显示找不到原文件。</p>
-</li>
-</ul>
-<blockquote>
-<p>com+M 调出曲线面板<br>com+U 调处色彩/饱和度，调整色相即可调整其颜色</p>
-<p>智能对象不能直接编辑，珊格化图层可以将其转换为普通的图层</p>
-</blockquote>
-<h2 id="素材的调整和图像合成"><a href="#素材的调整和图像合成" class="headerlink" title="素材的调整和图像合成"></a>素材的调整和图像合成</h2><blockquote>
-<p>自由变换：com+T</p>
-<p>补充：键盘上Fn+ESC可以长期改变F1-F9的功能，开时F1-F9可以当作快捷键使用，关闭时F1-F9用来调节系统声音、系统光亮大小。在F1-F12为快捷键模式时，使用Fn+Fx可以临时改变系统亮度、声音等，但是反过来不行</p>
-</blockquote>
-<h3 id="使用自由变换"><a href="#使用自由变换" class="headerlink" title="使用自由变换"></a>使用自由变换</h3><p>调整图层大小<br>放置在合适的位置上（必要时可以先调节图层的透明度，待位置调节好之后再恢复）<br>使用V移动其他图层，适当调节图片比例大小</p>
-<img src="/Users/qaq/Library/Containers/com.tencent.qq/Data/Library/Application Support/QQ/Users/1441210205/QQ/Temp.db/50D3C302-6057-4ED5-9A52-B0E6CF33FC29.png" alt="50D3C302-6057-4ED5-9A52-B0E6CF33FC29" style="zoom:80%;">
-
-<blockquote>
-<p>注意调整时锁定等比缩放和不锁定等比缩放时直接调节高度比例时的区别</p>
-</blockquote>
-<h3 id="去掉多余部分"><a href="#去掉多余部分" class="headerlink" title="去掉多余部分"></a>去掉多余部分</h3><p>使用魔棒工具（快速选择工具右键）选择纯色的背景，按delete键删除背景选区，再用com+D取消选区</p>
-<blockquote>
-<p>注意：魔棒工具删除纯色不能对置入的图片使用（两种置入方法都不行）</p>
-<p>可以直接使用套索工具圈出想要保留的部分，使用ctrl+J复制图层即可（注意图层的选择）</p>
-</blockquote>
-<p>总结：</p>
-<blockquote>
-<p>搜集、选择素材<br>素材合并<br>大小调整<br>清除多余部分<br>调色</p>
-</blockquote>
-<h1 id="图层蒙版"><a href="#图层蒙版" class="headerlink" title="图层蒙版"></a>图层蒙版</h1><blockquote>
-<p>“剪”在PS中叫做“抠图“</p>
-</blockquote>
-<h2 id="抠图的基础方法"><a href="#抠图的基础方法" class="headerlink" title="抠图的基础方法"></a>抠图的基础方法</h2><ul>
-<li><p>橡皮擦擦除法</p>
-<p>缺点：是在原图像上直接擦除不要的部分，会破坏原图像，操作不可逆，一旦操作失误，不可还原。</p>
-</li>
-<li><p>图层蒙版法<br>可逆的抠图方法。蒙，即为遮盖的意思。</p>
-</li>
-</ul>
-<h2 id="图层蒙版的操作方法及原理"><a href="#图层蒙版的操作方法及原理" class="headerlink" title="图层蒙版的操作方法及原理"></a>图层蒙版的操作方法及原理</h2><h3 id="蒙版的添加方法"><a href="#蒙版的添加方法" class="headerlink" title="蒙版的添加方法"></a>蒙版的添加方法</h3><p>通过图层面板底部的添加图层蒙版按钮添加蒙版，新增的白色图层即为蒙版层，原图层为被蒙版层，蒙版层利用黑 白 灰三种颜色控制被蒙版层图像的显示与隐藏,蒙版层颜色只能在缩略图中看到，画面显示蒙版结果</p>
-<p>![屏幕快照 2020-06-29 13.50.51](/Users/qaq/Desktop/屏幕快照 2020-06-29 13.50.51.png)![image-20200629140605689](/Users/qaq/Library/Application Support/typora-user-images/image-20200629140605689.png)         </p>
-<h2 id="图层蒙版的工作原理"><a href="#图层蒙版的工作原理" class="headerlink" title="图层蒙版的工作原理"></a>图层蒙版的工作原理</h2><p>黑色不显示被蒙版层图像：完全遮盖<br>灰色半透明显示被蒙版图像：半遮盖<br>白色显示被蒙版层图像：不遮盖</p>
-<p>![image-20200629141016826](/Users/qaq/Library/Application Support/typora-user-images/image-20200629141016826.png)</p>
-<h3 id="运用蒙版抠图的优点"><a href="#运用蒙版抠图的优点" class="headerlink" title="运用蒙版抠图的优点"></a>运用蒙版抠图的优点</h3><ul>
-<li>利用蒙版层的黑白灰控制蒙版层图像的显隐</li>
-<li>操作可逆，只要改变颜色就可以控制图像的显隐，不改变蒙版层的原图像 </li>
-</ul>
-<h2 id="换发型"><a href="#换发型" class="headerlink" title="换发型"></a>换发型</h2><ol>
-<li>隐藏区 &gt; 显示区：将白色蒙版层用快捷键填充黑色，注意底层为照片图层，上层为卷发图层</li>
-</ol>
-<blockquote>
-<p>填充前景色快捷键：Alt+delete<br>填充背景色快捷键：Ctrl+Delete</p>
-</blockquote>
-<ol start="2">
-<li><p>显示头发部分<br>激活蒙版层，在常规画笔中设置画笔为硬边圆，前景色为白色，在头发中间对应的区域涂抹.设置画笔为柔边圆，前景色为白色，在头发边缘对应的区域涂抹<br>可逆性操作：前景色设置为黑色，逆向涂抹，去掉底层不想要的部分</p>
-<blockquote>
-<p>注意<br>涂抹的时候一定是要在蒙版上涂抹的</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="剪贴蒙板"><a href="#剪贴蒙板" class="headerlink" title="剪贴蒙板"></a>剪贴蒙板</h2><h3 id="创建操作"><a href="#创建操作" class="headerlink" title="创建操作"></a>创建操作</h3><ul>
-<li>选择上层 -&gt; 右击 -&gt; 创建剪贴蒙板</li>
-<li>用图层菜单创建</li>
-<li>或者直接选择上层图层，使用快捷Ctrl+Alt+G创建剪贴蒙板）</li>
-</ul>
-<h3 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h3><p>![image-20200629152844305](/Users/qaq/Library/Application Support/typora-user-images/image-20200629152844305.png)</p>
-<ul>
-<li>剪贴蒙板：由两个或者两个以上的图层组成，最下面的脚基层，上面的为顶层</li>
-<li>顶层：创建剪贴蒙板时选择的图层</li>
-<li>基层：它下面的图层</li>
-</ul>
-<h4 id="顶层和基层在剪贴蒙板中怎样表达画面颜色和形状"><a href="#顶层和基层在剪贴蒙板中怎样表达画面颜色和形状" class="headerlink" title="顶层和基层在剪贴蒙板中怎样表达画面颜色和形状"></a>顶层和基层在剪贴蒙板中怎样表达画面颜色和形状</h4><blockquote>
-<p>比如在玫瑰花剪影中，剪影比玫瑰花小，即基层完全重叠在顶层中，此时剪贴版显示顶层（即玫瑰）的颜色；彩色纹理和文字只有重叠部分才会显示顶层（即纹理）颜色。</p>
-</blockquote>
-<ul>
-<li>剪贴蒙板的形状始终与基层形状一致，优先显示顶层图像的颜色，当顶层没有颜色时就显示基层颜色。即<strong><em>优先顶层颜色，保持基层形状</em></strong></li>
-<li>剪贴蒙板的优点为不会破坏顶层图像</li>
-<li>基层的形状控制顶层图像的显示区域，基层图像以外的区域隐藏，可以改变基层形状从而改变顶层显示</li>
-<li>剪贴蒙板为可逆性操作，可以释放剪贴蒙板</li>
-</ul>
-<p>![image-20200629153917360](/Users/qaq/Library/Application Support/typora-user-images/image-20200629153917360.png)</p>
-<h2 id="多图层剪贴蒙板应用"><a href="#多图层剪贴蒙板应用" class="headerlink" title="多图层剪贴蒙板应用"></a>多图层剪贴蒙板应用</h2><ul>
-<li>可以有多个顶层，选择顶层创建剪贴蒙板，顶层图层最底下的第一个图层会默认为基层，不能默认基层设置剪贴蒙板</li>
-</ul>
-<h3 id="多基层的剪贴蒙板"><a href="#多基层的剪贴蒙板" class="headerlink" title="多基层的剪贴蒙板"></a>多基层的剪贴蒙板</h3><ul>
-<li><p>多图层合并</p>
-<p>合并后的图像不能再单独调整原图层的位置、大小、颜色等</p>
-</li>
-<li><p>创建图层文件夹，将多图层放入一个文件夹中<br>既可以保持图层的独立性，又可实现多个基层和顶层之间的剪贴蒙板</p>
-</li>
-</ul>
-<h1 id="快速蒙板（选区）"><a href="#快速蒙板（选区）" class="headerlink" title="快速蒙板（选区）"></a>快速蒙板（选区）</h1><blockquote>
-<p>快速蒙板是一种临时蒙板，不会对图像本身进行修改，可以转换为选区，也可以将选区转换为快速蒙板，然后在快速蒙板编辑模式下进行编辑</p>
-</blockquote>
-<p>点击Q键进入快速蒙板模式，选区与快速蒙板之间指向颜色互换</p>
-<p>![屏幕快照 2020-07-01 09.29.05](/Users/qaq/Desktop/屏幕快照 2020-07-01 09.29.05.png)</p>
-<p>修改色彩指示区域、颜色、不透明度均可修改</p>
-<p>魔棒工具的使用：选择取样大小为取样点、调整容差大小（像素颜色相差大小），选择魔棒选区的选择选区样式（相加、相减等） ，再使用快速蒙板,用画笔涂抹，注意前景色为黑色，使用X可以进行反向涂抹</p>
-<p>![image-20200701094016188](/Users/qaq/Library/Application Support/typora-user-images/image-20200701094016188.png)</p>
-<p>![image-20200701094952971](/Users/qaq/Library/Application Support/typora-user-images/image-20200701094952971.png)</p>
-<p>![image-20200701144940235](/Users/qaq/Library/Application Support/typora-user-images/image-20200701144940235.png)</p>
-<p>滤镜：像素化–&gt;彩色半调/晶格化</p>
-<p>投影：fx</p>
-<p>图像选反的问题：</p>
-<p>![image-20200701152415307](/Users/qaq/Library/Application Support/typora-user-images/image-20200701152415307.png)</p>
-<p>蒙板白色为作用域，黑色为非作用域，可以使用com+delete填充整个蒙板颜色为黑色，用alt+delete填充整个蒙板颜色为白色</p>
 
           
         
@@ -2128,6 +2044,156 @@
 
 
     
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/25/%E8%AE%A4%E8%AF%86Linux%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wendyzy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wendyzy的blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/06/25/%E8%AE%A4%E8%AF%86Linux%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4/" itemprop="url">认识Linux常用指令</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-25T17:40:57+08:00">
+                2020-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>categories: Linux</p>
+<h6 id="mkdir"><a href="#mkdir" class="headerlink" title="mkdir"></a>mkdir</h6><p>创建目录,目录也是文件,可以指定路径(绝对)来创建</p>
+<h6 id="pwd"><a href="#pwd" class="headerlink" title="pwd"></a>pwd</h6><p>以绝对路径的方式显示用户当前的工作目录</p>
+<h6 id="ls"><a href="#ls" class="headerlink" title="ls"></a>ls</h6><p>显示目标列表</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/06/25/%E8%AE%A4%E8%AF%86Linux%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <div>
+    
+    </div>
+    
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
   
@@ -2178,7 +2244,7 @@
               
                 <a href="/archives/%20%7C%7C%20archive">
               
-                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
